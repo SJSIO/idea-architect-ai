@@ -1,7 +1,8 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
-import { ArrowLeft, Trash2, Clock, Loader2, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Trash2, Clock, Loader2, RefreshCw, Download } from 'lucide-react';
+import { exportToPDF } from '@/lib/pdf-export';
 import { Header } from '@/components/Header';
 import { AgentResultCard } from '@/components/AgentResultCard';
 import { AnalysisProgress } from '@/components/AnalysisProgress';
@@ -129,6 +130,20 @@ export default function ProjectDetail() {
           </Button>
 
           <div className="flex items-center gap-2">
+            {project.status === 'completed' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  exportToPDF(project);
+                  toast({ title: 'PDF downloaded', description: 'Your analysis report has been saved.' });
+                }}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export PDF
+              </Button>
+            )}
+            
             {project.status === 'failed' && (
               <Button
                 variant="outline"
