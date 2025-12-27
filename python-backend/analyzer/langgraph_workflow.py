@@ -1,57 +1,48 @@
-# =============================================================================
-# STARTUP ANALYZER - LangGraph Backend
-# =============================================================================
-# Deploy this on Railway, Render, AWS Lambda, Google Cloud Run, or any Python host
-# 
-# Setup:
-#   pip install -r requirements.txt
-#   export OPENAI_API_KEY=your_key  (or GROQ_API_KEY for Groq)
-#   uvicorn main:app --host 0.0.0.0 --port 8000
-# =============================================================================
+"""
+LangGraph Multi-Agent Workflow for Startup Analysis.
 
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Optional, TypedDict, Annotated
+This module contains:
+- Agent system prompts
+- LangGraph state definition
+- Agent node functions
+- Compiled workflow graph
+"""
+
+from typing import TypedDict, Optional
 from langgraph.graph import StateGraph, END
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
-# Alternatively use Groq:
-# from langchain_groq import ChatGroq
+from django.conf import settings
 import os
 
-# =============================================================================
-# FastAPI App Setup
-# =============================================================================
-
-app = FastAPI(title="Startup Analyzer API", version="1.0.0")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Configure for your frontend domain in production
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # =============================================================================
 # LLM Configuration
 # =============================================================================
 
-# Option 1: OpenAI
-llm = ChatOpenAI(
-    model="gpt-4o",
-    temperature=0.7,
-    api_key=os.getenv("OPENAI_API_KEY")
-)
+def get_llm():
+    """Get the configured LLM instance."""
+    api_key = settings.OPENAI_API_KEY or os.getenv('OPENAI_API_KEY')
+    
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY is not configured")
+    
+    return ChatOpenAI(
+        model="gpt-4o",
+        temperature=0.7,
+        api_key=api_key
+    )
 
-# Option 2: Groq (uncomment to use)
+# For Groq (uncomment to use):
 # from langchain_groq import ChatGroq
-# llm = ChatGroq(
-#     model_name="llama-3.1-70b-versatile",
-#     temperature=0.7,
-#     api_key=os.getenv("GROQ_API_KEY")
-# )
+# def get_llm():
+#     api_key = settings.GROQ_API_KEY or os.getenv('GROQ_API_KEY')
+#     return ChatGroq(
+#         model_name="llama-3.1-70b-versatile",
+#         temperature=0.7,
+#         api_key=api_key
+#     )
+
 
 # =============================================================================
 # Agent System Prompts
@@ -202,6 +193,7 @@ Critically analyze:
 Be constructively critical - identify problems AND suggest solutions.
 Your goal is to make the final plan stronger by exposing weaknesses now."""
 
+
 # =============================================================================
 # LangGraph State Definition
 # =============================================================================
@@ -219,6 +211,7 @@ class AnalysisState(TypedDict):
     critic_review: str
     final_strategy: str
 
+
 # =============================================================================
 # Agent Node Functions
 # =============================================================================
@@ -230,9 +223,11 @@ def create_user_context(state: AnalysisState) -> str:
         context += f"\nTarget Market: {state['target_market']}"
     return context
 
+
 def market_analyst_node(state: AnalysisState) -> dict:
     """Market Analyst agent."""
     print("🔍 Market Analyst working...")
+    llm = get_llm()
     context = create_user_context(state)
     response = llm.invoke([
         SystemMessage(content=MARKET_ANALYST_PROMPT),
@@ -240,9 +235,11 @@ def market_analyst_node(state: AnalysisState) -> dict:
     ])
     return {"market_analysis": response.content}
 
+
 def cost_predictor_node(state: AnalysisState) -> dict:
     """Cost Predictor agent."""
     print("💰 Cost Predictor working...")
+    llm = get_llm()
     context = create_user_context(state)
     response = llm.invoke([
         SystemMessage(content=COST_PREDICTOR_PROMPT),
@@ -250,9 +247,11 @@ def cost_predictor_node(state: AnalysisState) -> dict:
     ])
     return {"cost_prediction": response.content}
 
+
 def business_strategist_node(state: AnalysisState) -> dict:
     """Business Strategist agent."""
     print("🎯 Business Strategist working...")
+    llm = get_llm()
     context = create_user_context(state)
     response = llm.invoke([
         SystemMessage(content=BUSINESS_STRATEGIST_PROMPT),
@@ -260,9 +259,11 @@ def business_strategist_node(state: AnalysisState) -> dict:
     ])
     return {"business_strategy": response.content}
 
+
 def monetization_node(state: AnalysisState) -> dict:
     """Monetization Expert agent."""
     print("💳 Monetization Expert working...")
+    llm = get_llm()
     context = create_user_context(state)
     response = llm.invoke([
         SystemMessage(content=MONETIZATION_PROMPT),
@@ -270,9 +271,11 @@ def monetization_node(state: AnalysisState) -> dict:
     ])
     return {"monetization": response.content}
 
+
 def legal_advisor_node(state: AnalysisState) -> dict:
     """Legal Advisor agent."""
     print("⚖️ Legal Advisor working...")
+    llm = get_llm()
     context = create_user_context(state)
     response = llm.invoke([
         SystemMessage(content=LEGAL_ADVISOR_PROMPT),
@@ -280,9 +283,11 @@ def legal_advisor_node(state: AnalysisState) -> dict:
     ])
     return {"legal_considerations": response.content}
 
+
 def tech_architect_node(state: AnalysisState) -> dict:
     """Tech Architect agent."""
     print("💻 Tech Architect working...")
+    llm = get_llm()
     context = create_user_context(state)
     response = llm.invoke([
         SystemMessage(content=TECH_ARCHITECT_PROMPT),
@@ -290,9 +295,11 @@ def tech_architect_node(state: AnalysisState) -> dict:
     ])
     return {"tech_stack": response.content}
 
+
 def strategist_synthesis_node(state: AnalysisState) -> dict:
     """Strategist synthesizes all agent outputs."""
     print("🔮 Strategist synthesizing insights...")
+    llm = get_llm()
     
     synthesis_context = f"""
 Original Startup Idea: {state['startup_idea']}
@@ -323,9 +330,11 @@ Original Startup Idea: {state['startup_idea']}
     ])
     return {"strategist_synthesis": response.content}
 
+
 def critic_review_node(state: AnalysisState) -> dict:
     """Critic reviews and challenges the strategist's plan."""
     print("🔍 Critic reviewing the plan...")
+    llm = get_llm()
     
     critic_context = f"""
 Original Startup Idea: {state['startup_idea']}
@@ -344,9 +353,11 @@ Cost Estimates: {state['cost_prediction'][:1000]}...
     ])
     return {"critic_review": response.content}
 
+
 def final_refinement_node(state: AnalysisState) -> dict:
     """Strategist refines plan based on critic feedback."""
     print("✨ Generating final refined strategy...")
+    llm = get_llm()
     
     refinement_prompt = """You are the Senior Business Strategist again.
 Review the Critic's feedback and refine your strategic plan.
@@ -369,6 +380,7 @@ Based on this feedback, provide a refined final strategy that addresses the vali
     ])
     return {"final_strategy": response.content}
 
+
 # =============================================================================
 # Build the LangGraph Workflow
 # =============================================================================
@@ -389,11 +401,10 @@ def build_analysis_graph() -> StateGraph:
     workflow.add_node("critic_review", critic_review_node)
     workflow.add_node("final_refinement", final_refinement_node)
     
-    # Set entry point - all 6 agents run in parallel conceptually
-    # (LangGraph will handle this based on the edges)
+    # Set entry point
     workflow.set_entry_point("market_analyst")
     
-    # Phase 1: Run 6 specialist agents (sequential for simplicity, can be parallelized)
+    # Phase 1: Run 6 specialist agents sequentially
     workflow.add_edge("market_analyst", "cost_predictor")
     workflow.add_edge("cost_predictor", "business_strategist")
     workflow.add_edge("business_strategist", "monetization")
@@ -414,86 +425,42 @@ def build_analysis_graph() -> StateGraph:
     
     return workflow.compile()
 
-# Create the compiled graph
-analysis_graph = build_analysis_graph()
 
-# =============================================================================
-# API Request/Response Models
-# =============================================================================
-
-class AnalysisRequest(BaseModel):
-    startupIdea: str
-    targetMarket: Optional[str] = None
-    projectId: Optional[str] = None
-
-class AnalysisResponse(BaseModel):
-    success: bool
-    projectId: Optional[str]
-    analysis: dict
-    error: Optional[str] = None
-
-# =============================================================================
-# API Endpoints
-# =============================================================================
-
-@app.get("/")
-async def root():
-    return {"message": "Startup Analyzer API - LangGraph Backend", "version": "1.0.0"}
-
-@app.get("/health")
-async def health():
-    return {"status": "healthy"}
-
-@app.post("/analyze", response_model=AnalysisResponse)
-async def analyze_startup(request: AnalysisRequest):
+def run_analysis(startup_idea: str, target_market: Optional[str] = None) -> dict:
     """
-    Analyze a startup idea using the multi-agent LangGraph workflow.
+    Run the complete multi-agent analysis workflow.
+    
+    Args:
+        startup_idea: The startup idea to analyze
+        target_market: Optional target market specification
+        
+    Returns:
+        Dictionary containing all analysis results
     """
-    try:
-        print(f"📊 Starting analysis for: {request.startupIdea[:100]}...")
-        
-        # Initialize state
-        initial_state: AnalysisState = {
-            "startup_idea": request.startupIdea,
-            "target_market": request.targetMarket,
-            "market_analysis": "",
-            "cost_prediction": "",
-            "business_strategy": "",
-            "monetization": "",
-            "legal_considerations": "",
-            "tech_stack": "",
-            "strategist_synthesis": "",
-            "critic_review": "",
-            "final_strategy": "",
-        }
-        
-        # Run the graph
-        final_state = analysis_graph.invoke(initial_state)
-        
-        print("✅ Analysis complete!")
-        
-        return AnalysisResponse(
-            success=True,
-            projectId=request.projectId,
-            analysis={
-                "marketAnalysis": final_state["market_analysis"],
-                "costPrediction": final_state["cost_prediction"],
-                "businessStrategy": final_state["business_strategy"],
-                "monetization": final_state["monetization"],
-                "legalConsiderations": final_state["legal_considerations"],
-                "techStack": final_state["tech_stack"],
-                "strategistCritique": final_state["final_strategy"],
-            }
-        )
-        
-    except Exception as e:
-        print(f"❌ Error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-# =============================================================================
-# Run the server (for local development)
-# =============================================================================
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    graph = build_analysis_graph()
+    
+    initial_state: AnalysisState = {
+        "startup_idea": startup_idea,
+        "target_market": target_market,
+        "market_analysis": "",
+        "cost_prediction": "",
+        "business_strategy": "",
+        "monetization": "",
+        "legal_considerations": "",
+        "tech_stack": "",
+        "strategist_synthesis": "",
+        "critic_review": "",
+        "final_strategy": "",
+    }
+    
+    final_state = graph.invoke(initial_state)
+    
+    return {
+        "market_analysis": final_state["market_analysis"],
+        "cost_prediction": final_state["cost_prediction"],
+        "business_strategy": final_state["business_strategy"],
+        "monetization": final_state["monetization"],
+        "legal_considerations": final_state["legal_considerations"],
+        "tech_stack": final_state["tech_stack"],
+        "strategist_critique": final_state["final_strategy"],
+    }
