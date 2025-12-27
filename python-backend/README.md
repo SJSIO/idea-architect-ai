@@ -1,6 +1,27 @@
-# Startup Analyzer - LangGraph Python Backend
+# Startup Analyzer - Django + LangGraph Backend
 
-This is the Python/LangGraph backend for the Startup Analyzer application.
+This is the Django/LangGraph backend for the Startup Analyzer application.
+
+## Project Structure
+
+```
+python-backend/
+├── manage.py                      # Django CLI
+├── requirements.txt               # Dependencies
+├── startup_analyzer/              # Django project settings
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   ├── wsgi.py
+│   └── asgi.py
+└── analyzer/                      # Main app
+    ├── __init__.py
+    ├── models.py                  # Project model
+    ├── views.py                   # API views
+    ├── urls.py                    # URL routing
+    ├── serializers.py             # DRF serializers
+    └── langgraph_workflow.py      # LangGraph multi-agent workflow
+```
 
 ## Setup
 
@@ -18,19 +39,32 @@ pip install -r requirements.txt
 
 3. **Set environment variables**
 ```bash
-# Option 1: OpenAI
-export OPENAI_API_KEY=your_openai_key
+# Create .env file
+echo "OPENAI_API_KEY=your_openai_key" > .env
+echo "DJANGO_SECRET_KEY=your-secret-key-here" >> .env
 
-# Option 2: Groq (uncomment groq lines in main.py)
-export GROQ_API_KEY=your_groq_key
+# Or export directly
+export OPENAI_API_KEY=your_openai_key
+export DJANGO_SECRET_KEY=your-secret-key-here
 ```
 
-4. **Run the server**
+4. **Run migrations**
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+python manage.py migrate
+```
+
+5. **Run the development server**
+```bash
+python manage.py runserver 0.0.0.0:8000
 ```
 
 ## API Endpoints
+
+### `GET /`
+API information and available endpoints.
+
+### `GET /health`
+Health check endpoint.
 
 ### `POST /analyze`
 Analyzes a startup idea using 6 AI agents + strategist/critic debate.
@@ -61,39 +95,62 @@ Analyzes a startup idea using 6 AI agents + strategist/critic debate.
 }
 ```
 
-## Deployment Options
+### `GET /projects`
+List all projects.
+
+### `POST /projects`
+Create a new project.
+
+### `GET /projects/{id}`
+Get project details.
+
+### `DELETE /projects/{id}`
+Delete a project.
+
+## Deployment
 
 ### Railway
 1. Create new project on railway.app
 2. Connect your GitHub repo
-3. Set environment variables
-4. Deploy automatically
+3. Set environment variables:
+   - `OPENAI_API_KEY`
+   - `DJANGO_SECRET_KEY`
+4. Start command: `gunicorn startup_analyzer.wsgi:application --bind 0.0.0.0:$PORT`
 
 ### Render
 1. Create new Web Service on render.com
 2. Connect GitHub repo
-3. Build command: `pip install -r requirements.txt`
-4. Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-
-### Google Cloud Run
-```bash
-gcloud run deploy startup-analyzer \
-  --source . \
-  --region us-central1 \
-  --allow-unauthenticated
-```
+3. Build command: `pip install -r requirements.txt && python manage.py migrate`
+4. Start command: `gunicorn startup_analyzer.wsgi:application`
 
 ### Docker
 ```dockerfile
 FROM python:3.11-slim
+
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
+
 COPY . .
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+RUN python manage.py migrate
+
+EXPOSE 8000
+CMD ["gunicorn", "startup_analyzer.wsgi:application", "--bind", "0.0.0.0:8000"]
 ```
 
-## Architecture
+### Heroku
+```bash
+# Create Procfile
+echo "web: gunicorn startup_analyzer.wsgi:application" > Procfile
+
+# Deploy
+heroku create
+heroku config:set OPENAI_API_KEY=your_key
+heroku config:set DJANGO_SECRET_KEY=your_secret
+git push heroku main
+```
+
+## LangGraph Workflow Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -127,9 +184,9 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Connecting to Lovable Frontend
+## Using with Lovable Frontend
 
-Once deployed, update your Lovable frontend to call your Python backend:
+Once deployed, update your Lovable frontend to call your Django backend:
 
 1. Get your deployed API URL (e.g., `https://your-app.railway.app`)
-2. Update the frontend to call this URL instead of the edge function
+2. Update the frontend API calls to use this URL
