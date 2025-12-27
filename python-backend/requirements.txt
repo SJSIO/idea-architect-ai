@@ -1,0 +1,19 @@
+# Startup Analyzer - LangGraph Backend
+# Python 3.10+ required
+
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.5.0
+langchain>=0.1.0
+langchain-openai>=0.0.5
+langchain-community>=0.0.10
+langgraph>=0.0.20
+python-dotenv>=1.0.0
+
+# Optional: For Groq instead of OpenAI
+# langchain-groq>=0.0.1
+
+# Optional: For RAG features (like your original app)
+# chromadb>=0.4.0
+# sentence-transformers>=2.2.0
+# pypdf>=3.17.0
