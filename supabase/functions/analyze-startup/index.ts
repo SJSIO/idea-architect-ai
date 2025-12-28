@@ -13,32 +13,59 @@ interface AgentResult {
   content: string;
 }
 
-async function callAgent(systemPrompt: string, userMessage: string, model = 'google/gemini-2.5-flash'): Promise<string> {
+async function callAgent(systemPrompt: string, userMessage: string, model = 'google/gemini-2.5-flash', retries = 3): Promise<string> {
   console.log(`Calling agent with model: ${model}`);
   
-  const response = await fetch(AI_GATEWAY_URL, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userMessage },
-      ],
-    }),
-  });
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(AI_GATEWAY_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userMessage },
+          ],
+        }),
+      });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`AI Gateway error: ${response.status} - ${errorText}`);
-    throw new Error(`AI Gateway error: ${response.status}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`AI Gateway error (attempt ${attempt}/${retries}): ${response.status} - ${errorText.substring(0, 200)}`);
+        
+        // Don't retry on client errors (4xx) except rate limits
+        if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+          throw new Error(`AI Gateway error: ${response.status}`);
+        }
+        
+        // Retry on server errors (5xx) or rate limits
+        if (attempt < retries) {
+          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+          console.log(`Retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+        
+        throw new Error(`AI Gateway error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.choices?.[0]?.message?.content || 'No response generated';
+    } catch (error) {
+      if (attempt === retries) {
+        throw error;
+      }
+      console.log(`Attempt ${attempt} failed, retrying...`);
+      const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
   }
-
-  const data = await response.json();
-  return data.choices?.[0]?.message?.content || 'No response generated';
+  
+  throw new Error('All retry attempts failed');
 }
 
 // Agent System Prompts
