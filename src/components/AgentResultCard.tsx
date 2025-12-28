@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp, Copy, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { formatContentForDisplay } from '@/lib/format-content';
 import type { AgentCard } from '@/types/project';
 
 interface AgentResultCardProps {
@@ -15,9 +16,12 @@ export function AgentResultCard({ agent, content, index }: AgentResultCardProps)
   const [isExpanded, setIsExpanded] = useState(true);
   const [copied, setCopied] = useState(false);
 
+  // Format content to remove asterisks
+  const formattedContent = content ? formatContentForDisplay(content) : null;
+
   const handleCopy = async () => {
-    if (!content) return;
-    await navigator.clipboard.writeText(content);
+    if (!formattedContent) return;
+    await navigator.clipboard.writeText(formattedContent);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -90,7 +94,7 @@ export function AgentResultCard({ agent, content, index }: AgentResultCardProps)
         <CardContent className="pt-2">
           <div className="prose prose-sm prose-invert max-w-none">
             <div className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">
-              {content}
+              {formattedContent}
             </div>
           </div>
         </CardContent>
