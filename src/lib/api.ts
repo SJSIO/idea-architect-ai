@@ -82,23 +82,32 @@ export async function updateProjectAnalysis(id: string, analysis: AnalysisResult
   }
 }
 
+const DJANGO_API_URL = 'https://idea-architect-ai-1.onrender.com';
+
 export async function analyzeStartup(
   startupIdea: string,
   targetMarket: string | undefined,
   projectId: string
 ): Promise<AnalysisResult> {
-  const { data, error } = await supabase.functions.invoke('analyze-startup', {
-    body: {
+  const response = await fetch(`${DJANGO_API_URL}/analyze`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
       startupIdea,
       targetMarket,
       projectId,
-    },
+    }),
   });
 
-  if (error) {
-    console.error('Error analyzing startup:', error);
-    throw error;
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    console.error('Error analyzing startup:', errorData);
+    throw new Error(errorData.error || 'Analysis failed');
   }
+
+  const data = await response.json();
 
   if (!data.success) {
     throw new Error(data.error || 'Analysis failed');
