@@ -84,6 +84,5 @@ REST_FRAMEWORK = {
     ],
 }
 
-# LLM Configuration
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+# LLM Configuration (Groq Cloud API)
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
