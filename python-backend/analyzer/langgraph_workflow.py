@@ -11,37 +11,27 @@ This module contains:
 from typing import TypedDict, Optional
 from langgraph.graph import StateGraph, END
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
 from django.conf import settings
 import os
 
 
 # =============================================================================
-# LLM Configuration
+# LLM Configuration (Using Groq Cloud API)
 # =============================================================================
 
 def get_llm():
-    """Get the configured LLM instance."""
-    api_key = settings.OPENAI_API_KEY or os.getenv('OPENAI_API_KEY')
+    """Get the configured Groq LLM instance."""
+    api_key = settings.GROQ_API_KEY or os.getenv('GROQ_API_KEY')
     
     if not api_key:
-        raise ValueError("OPENAI_API_KEY is not configured")
+        raise ValueError("GROQ_API_KEY is not configured. Set it in your environment variables.")
     
-    return ChatOpenAI(
-        model="gpt-4o",
+    return ChatGroq(
+        model_name="llama-3.3-70b-versatile",
         temperature=0.7,
         api_key=api_key
     )
-
-# For Groq (uncomment to use):
-# from langchain_groq import ChatGroq
-# def get_llm():
-#     api_key = settings.GROQ_API_KEY or os.getenv('GROQ_API_KEY')
-#     return ChatGroq(
-#         model_name="llama-3.1-70b-versatile",
-#         temperature=0.7,
-#         api_key=api_key
-#     )
 
 
 # =============================================================================
