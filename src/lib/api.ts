@@ -89,33 +89,96 @@ export async function analyzeStartup(
   targetMarket: string | undefined,
   projectId: string
 ): Promise<AnalysisResult> {
-  // Use the Django backend with Groq Cloud for analysis
-  const response = await fetch(`${DJANGO_API_URL}/analyze`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      startupIdea,
-      targetMarket,
-      projectId,
-    }),
-  });
+  // Use only the Django backend (Groq/LangGraph) for analysis.
+  // Render deployments often "sleep"; we pre-wake via /health and retry once.
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    console.error('Error analyzing startup:', errorData);
-    throw new Error(errorData.error || 'Analysis failed - Django backend may be waking up, please try again in 30 seconds');
+  const payload = {
+    startupIdea,
+    targetMarket,
+    projectId,
+  };
+
+  const fetchWithTimeout = async (
+    url: string,
+    options: RequestInit,
+    timeoutMs: number
+  ): Promise<Response> => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      return await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
+  };
+
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  // 1) Pre-wake backend (no CORS preflight for simple GET)
+  try {
+    await fetchWithTimeout(`${DJANGO_API_URL}/health`, { method: 'GET' }, 12000);
+  } catch {
+    // If wake fails, we still attempt analyze; retry logic below may recover.
   }
 
-  const data = await response.json();
+  // 2) Analyze (retry once to survive cold starts)
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const response = await fetchWithTimeout(
+        `${DJANGO_API_URL}/analyze`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        },
+        // Give enough time for a cold start + analysis.
+        120000
+      );
 
-  if (!data.success) {
-    throw new Error(data.error || 'Analysis failed');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Error analyzing startup (Django):', response.status, errorData);
+
+        // Cold start often returns 502/503/504 briefly.
+        if (attempt === 1 && response.status >= 500) {
+          await sleep(8000);
+          continue;
+        }
+
+        throw new Error(
+          errorData.error ||
+            `Analysis failed (Django ${response.status}). If the backend was sleeping, wait ~30s and try again.`
+        );
+      }
+
+      const data = await response.json();
+      if (!data?.success) throw new Error(data?.error || 'Analysis failed');
+
+      return data.analysis as AnalysisResult;
+    } catch (e) {
+      console.warn('Django analyze request failed:', e);
+      if (attempt === 1) {
+        await sleep(8000);
+        continue;
+      }
+      throw new Error(
+        e instanceof Error
+          ? e.message
+          : 'Analysis failed (Django backend unreachable)'
+      );
+    }
   }
 
-  return data.analysis as AnalysisResult;
+  // Unreachable
+  throw new Error('Analysis failed');
 }
+
 
 export async function deleteProject(id: string): Promise<void> {
   const { error } = await supabase
