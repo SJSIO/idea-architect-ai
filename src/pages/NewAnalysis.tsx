@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AnalysisProgress } from '@/components/AnalysisProgress';
+import { BackendStatus } from '@/components/BackendStatus';
 import { useToast } from '@/hooks/use-toast';
 import { createProject, analyzeStartup, updateProjectAnalysis, updateProjectStatus } from '@/lib/api';
 
@@ -19,6 +20,7 @@ export default function NewAnalysis() {
   
   const [startupIdea, setStartupIdea] = useState('');
   const [targetMarket, setTargetMarket] = useState('');
+  const [backendReady, setBackendReady] = useState(false);
 
   const analyzeMutation = useMutation({
     mutationFn: async () => {
@@ -126,6 +128,8 @@ export default function NewAnalysis() {
                 />
               </div>
 
+              <BackendStatus onStatusChange={setBackendReady} />
+
               <AnalysisProgress isAnalyzing={analyzeMutation.isPending} />
 
               <Button
@@ -133,12 +137,17 @@ export default function NewAnalysis() {
                 variant="hero"
                 size="lg"
                 className="w-full"
-                disabled={analyzeMutation.isPending || !startupIdea.trim()}
+                disabled={analyzeMutation.isPending || !startupIdea.trim() || !backendReady}
               >
                 {analyzeMutation.isPending ? (
                   <>
                     <Sparkles className="h-5 w-5 animate-pulse" />
                     AI Agents Working...
+                  </>
+                ) : !backendReady ? (
+                  <>
+                    <Sparkles className="h-5 w-5" />
+                    Waiting for Backend...
                   </>
                 ) : (
                   <>
