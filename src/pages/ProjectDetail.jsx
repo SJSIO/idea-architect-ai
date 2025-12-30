@@ -22,17 +22,17 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { getProject, deleteProject, analyzeStartup, updateProjectAnalysis, updateProjectStatus } from '@/lib/api';
-import { AGENT_CARDS, type AnalysisResult } from '@/types/project';
+import { AGENT_CARDS } from '@/types/project';
 
 export default function ProjectDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   const { data: project, isLoading, error, refetch } = useQuery({
     queryKey: ['project', id],
-    queryFn: () => getProject(id!),
+    queryFn: () => getProject(id),
     enabled: !!id,
     refetchInterval: (query) => {
       // Refetch every 2 seconds while analyzing
@@ -41,7 +41,7 @@ export default function ProjectDetail() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: () => deleteProject(id!),
+    mutationFn: () => deleteProject(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast({ title: 'Project deleted' });
@@ -68,7 +68,7 @@ export default function ProjectDetail() {
       toast({ title: 'Analysis complete!' });
     },
     onError: (error) => {
-      updateProjectStatus(id!, 'failed');
+      updateProjectStatus(id, 'failed');
       toast({
         variant: 'destructive',
         title: 'Analysis failed',
@@ -105,7 +105,7 @@ export default function ProjectDetail() {
     );
   }
 
-  const analysisData: Record<keyof AnalysisResult, string | null> = {
+  const analysisData = {
     marketAnalysis: project.market_analysis,
     costPrediction: project.cost_prediction,
     businessStrategy: project.business_strategy,

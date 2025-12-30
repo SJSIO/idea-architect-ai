@@ -1,7 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { Project, AnalysisResult } from '@/types/project';
 
-export async function getProjects(): Promise<Project[]> {
+export async function getProjects() {
   const { data, error } = await supabase
     .from('projects')
     .select('*')
@@ -12,10 +11,10 @@ export async function getProjects(): Promise<Project[]> {
     throw error;
   }
 
-  return data as Project[];
+  return data;
 }
 
-export async function getProject(id: string): Promise<Project | null> {
+export async function getProject(id) {
   const { data, error } = await supabase
     .from('projects')
     .select('*')
@@ -27,10 +26,10 @@ export async function getProject(id: string): Promise<Project | null> {
     throw error;
   }
 
-  return data as Project;
+  return data;
 }
 
-export async function createProject(startupIdea: string, targetMarket?: string): Promise<Project> {
+export async function createProject(startupIdea, targetMarket) {
   const { data, error } = await supabase
     .from('projects')
     .insert({
@@ -46,10 +45,10 @@ export async function createProject(startupIdea: string, targetMarket?: string):
     throw error;
   }
 
-  return data as Project;
+  return data;
 }
 
-export async function updateProjectStatus(id: string, status: Project['status']): Promise<void> {
+export async function updateProjectStatus(id, status) {
   const { error } = await supabase
     .from('projects')
     .update({ status })
@@ -61,7 +60,7 @@ export async function updateProjectStatus(id: string, status: Project['status'])
   }
 }
 
-export async function updateProjectAnalysis(id: string, analysis: AnalysisResult): Promise<void> {
+export async function updateProjectAnalysis(id, analysis) {
   const { error } = await supabase
     .from('projects')
     .update({
@@ -84,11 +83,7 @@ export async function updateProjectAnalysis(id: string, analysis: AnalysisResult
 
 const DJANGO_API_URL = 'https://idea-architect-ai-1.onrender.com';
 
-export async function analyzeStartup(
-  startupIdea: string,
-  targetMarket: string | undefined,
-  projectId: string
-): Promise<AnalysisResult> {
+export async function analyzeStartup(startupIdea, targetMarket, projectId) {
   // Use only the Django backend (Groq/LangGraph) for analysis.
   // Render deployments often "sleep"; we pre-wake via /health and retry once.
 
@@ -98,11 +93,7 @@ export async function analyzeStartup(
     projectId,
   };
 
-  const fetchWithTimeout = async (
-    url: string,
-    options: RequestInit,
-    timeoutMs: number
-  ): Promise<Response> => {
+  const fetchWithTimeout = async (url, options, timeoutMs) => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -116,7 +107,7 @@ export async function analyzeStartup(
     }
   };
 
-  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   // 1) Pre-wake backend (no CORS preflight for simple GET)
   try {
@@ -160,7 +151,7 @@ export async function analyzeStartup(
       const data = await response.json();
       if (!data?.success) throw new Error(data?.error || 'Analysis failed');
 
-      return data.analysis as AnalysisResult;
+      return data.analysis;
     } catch (e) {
       console.warn('Django analyze request failed:', e);
       if (attempt === 1) {
@@ -180,7 +171,7 @@ export async function analyzeStartup(
 }
 
 
-export async function deleteProject(id: string): Promise<void> {
+export async function deleteProject(id) {
   const { error } = await supabase
     .from('projects')
     .delete()

@@ -3,12 +3,6 @@ import { formatDistanceToNow } from 'date-fns';
 import { ArrowRight, Clock, CheckCircle2, Loader2, XCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { Project } from '@/types/project';
-
-interface ProjectCardProps {
-  project: Project;
-  index: number;
-}
 
 const statusConfig = {
   pending: {
@@ -33,7 +27,7 @@ const statusConfig = {
   },
 };
 
-export function ProjectCard({ project, index }: ProjectCardProps) {
+export function ProjectCard({ project, index }) {
   const status = statusConfig[project.status];
   const StatusIcon = status.icon;
 
