@@ -1,23 +1,22 @@
 import jsPDF from 'jspdf';
-import type { Project } from '@/types/project';
 import { AGENT_CARDS } from '@/types/project';
 import { formatContentForPDF } from '@/lib/format-content';
 
 const COLORS = {
-  primary: [45, 212, 191] as [number, number, number], // Teal
-  background: [15, 23, 42] as [number, number, number], // Dark blue
-  cardBg: [30, 41, 59] as [number, number, number], // Slate
-  text: [241, 245, 249] as [number, number, number], // Light
-  muted: [148, 163, 184] as [number, number, number], // Gray
-  chart1: [45, 212, 191] as [number, number, number], // Teal
-  chart2: [99, 102, 241] as [number, number, number], // Indigo
-  chart3: [244, 114, 182] as [number, number, number], // Pink
-  chart4: [251, 191, 36] as [number, number, number], // Amber
-  chart5: [34, 197, 94] as [number, number, number], // Green
+  primary: [45, 212, 191],
+  background: [15, 23, 42],
+  cardBg: [30, 41, 59],
+  text: [241, 245, 249],
+  muted: [148, 163, 184],
+  chart1: [45, 212, 191],
+  chart2: [99, 102, 241],
+  chart3: [244, 114, 182],
+  chart4: [251, 191, 36],
+  chart5: [34, 197, 94],
 };
 
-function wrapText(text: string, maxWidth: number, pdf: jsPDF): string[] {
-  const lines: string[] = [];
+function wrapText(text, maxWidth, pdf) {
+  const lines = [];
   const paragraphs = text.split('\n');
   
   for (const paragraph of paragraphs) {
@@ -49,7 +48,7 @@ function wrapText(text: string, maxWidth: number, pdf: jsPDF): string[] {
   return lines;
 }
 
-function addPage(pdf: jsPDF): number {
+function addPage(pdf) {
   pdf.addPage();
   // Add background
   pdf.setFillColor(...COLORS.background);
@@ -58,14 +57,7 @@ function addPage(pdf: jsPDF): number {
 }
 
 // Draw a simple pie chart
-function drawPieChart(
-  pdf: jsPDF, 
-  x: number, 
-  y: number, 
-  radius: number, 
-  data: { label: string; value: number; color: [number, number, number] }[],
-  title: string
-): number {
+function drawPieChart(pdf, x, y, radius, data, title) {
   const total = data.reduce((sum, item) => sum + item.value, 0);
   if (total === 0) return y;
 
@@ -90,7 +82,7 @@ function drawPieChart(
     
     // Create pie slice path
     const segments = 20;
-    const points: [number, number][] = [[centerX, centerY]];
+    const points = [[centerX, centerY]];
     
     for (let i = 0; i <= segments; i++) {
       const angle = startAngle + (sliceAngle * i / segments);
@@ -139,15 +131,7 @@ function drawPieChart(
 }
 
 // Draw a simple bar chart
-function drawBarChart(
-  pdf: jsPDF,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  data: { label: string; value: number; color: [number, number, number] }[],
-  title: string
-): number {
+function drawBarChart(pdf, x, y, width, height, data, title) {
   if (data.length === 0) return y;
   
   const maxValue = Math.max(...data.map(d => d.value));
@@ -193,8 +177,8 @@ function drawBarChart(
 }
 
 // Extract numeric data from cost prediction text
-function extractCostData(content: string): { label: string; value: number; color: [number, number, number] }[] {
-  const data: { label: string; value: number; color: [number, number, number] }[] = [];
+function extractCostData(content) {
+  const data = [];
   const colors = [COLORS.chart1, COLORS.chart2, COLORS.chart3, COLORS.chart4, COLORS.chart5];
   
   // Try to find dollar amounts with labels
@@ -245,17 +229,17 @@ function extractCostData(content: string): { label: string; value: number; color
 }
 
 // Extract market data for visualization
-function extractMarketData(content: string): { label: string; value: number; color: [number, number, number] }[] {
+function extractMarketData(content) {
   const colors = [COLORS.chart1, COLORS.chart2, COLORS.chart3];
   
   // Look for TAM, SAM, SOM values
-  const data: { label: string; value: number; color: [number, number, number] }[] = [];
+  const data = [];
   
   const tamMatch = content.match(/TAM[^$]*\$?([\d.]+)\s*(billion|million|B|M)/i);
   const samMatch = content.match(/SAM[^$]*\$?([\d.]+)\s*(billion|million|B|M)/i);
   const somMatch = content.match(/SOM[^$]*\$?([\d.]+)\s*(billion|million|B|M)/i);
 
-  const parseValue = (match: RegExpMatchArray | null): number => {
+  const parseValue = (match) => {
     if (!match) return 0;
     let value = parseFloat(match[1]);
     if (/billion|B/i.test(match[2])) value *= 1000;
@@ -284,7 +268,7 @@ function extractMarketData(content: string): { label: string; value: number; col
   return data;
 }
 
-export function exportToPDF(project: Project): void {
+export function exportToPDF(project) {
   const pdf = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -377,7 +361,7 @@ export function exportToPDF(project: Project): void {
   yPosition += 20;
 
   // Analysis sections
-  const analysisData: Record<string, string | null> = {
+  const analysisData = {
     marketAnalysis: project.market_analysis,
     costPrediction: project.cost_prediction,
     businessStrategy: project.business_strategy,
