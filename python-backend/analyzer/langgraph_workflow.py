@@ -21,17 +21,21 @@ import os
 # =============================================================================
 
 def get_llm():
-    """Get the configured Groq LLM instance."""
+    """Get the configured Groq LLM instance.
+    
+    Using llama-3.1-8b-instant to reduce memory usage on Render free tier.
+    This model is faster and uses significantly less memory.
+    """
     api_key = settings.GROQ_API_KEY or os.getenv('GROQ_API_KEY')
     
     if not api_key:
         raise ValueError("GROQ_API_KEY is not configured. Set it in your environment variables.")
     
     return ChatGroq(
-        model_name="llama-3.3-70b-versatile",
+        model_name="llama-3.1-8b-instant",
         temperature=0.7,
         api_key=api_key,
-        max_tokens=4096
+        max_tokens=2048
     )
 
 
