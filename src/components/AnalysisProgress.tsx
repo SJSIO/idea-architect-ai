@@ -15,7 +15,11 @@ const ANALYSIS_STEPS = [
   { id: 9, label: 'Final Refinement', icon: '✨', duration: 10 },
 ];
 
-export function AnalysisProgress({ isAnalyzing }) {
+interface AnalysisProgressProps {
+  isAnalyzing: boolean;
+}
+
+export function AnalysisProgress({ isAnalyzing }: AnalysisProgressProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
 

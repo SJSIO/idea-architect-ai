@@ -4,8 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { formatContentForDisplay } from '@/lib/format-content';
+import type { AgentCard } from '@/types/project';
 
-export function AgentResultCard({ agent, content, index }) {
+interface AgentResultCardProps {
+  agent: AgentCard;
+  content: string | null;
+  index: number;
+}
+
+export function AgentResultCard({ agent, content, index }: AgentResultCardProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [copied, setCopied] = useState(false);
 

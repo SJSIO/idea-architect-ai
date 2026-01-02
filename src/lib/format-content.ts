@@ -6,7 +6,7 @@
  * Removes markdown asterisks and other formatting characters from text
  * while preserving the text content
  */
-export function cleanMarkdownFormatting(text) {
+export function cleanMarkdownFormatting(text: string): string {
   if (!text) return '';
   
   return text
@@ -25,7 +25,7 @@ export function cleanMarkdownFormatting(text) {
  * Formats content for display, converting markdown-style formatting
  * to clean, readable text with proper structure
  */
-export function formatContentForDisplay(content) {
+export function formatContentForDisplay(content: string): string {
   if (!content) return '';
   
   return content
@@ -46,7 +46,7 @@ export function formatContentForDisplay(content) {
  * Formats content for PDF export, cleaning up markdown
  * and preparing text for document rendering
  */
-export function formatContentForPDF(content) {
+export function formatContentForPDF(content: string): string {
   if (!content) return '';
   
   return content

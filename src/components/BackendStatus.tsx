@@ -5,8 +5,14 @@ import { cn } from '@/lib/utils';
 
 const DJANGO_API_URL = 'https://idea-architect-ai-1.onrender.com';
 
-export function BackendStatus({ onStatusChange }) {
-  const [status, setStatus] = useState('checking');
+type Status = 'checking' | 'ready' | 'waking' | 'offline';
+
+interface BackendStatusProps {
+  onStatusChange?: (isReady: boolean) => void;
+}
+
+export function BackendStatus({ onStatusChange }: BackendStatusProps) {
+  const [status, setStatus] = useState<Status>('checking');
   const [retryCount, setRetryCount] = useState(0);
 
   const checkHealth = async () => {

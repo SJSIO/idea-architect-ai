@@ -61,7 +61,7 @@ export default function NewAnalysis() {
     },
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!startupIdea.trim()) {
       toast({

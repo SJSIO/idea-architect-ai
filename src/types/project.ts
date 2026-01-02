@@ -1,4 +1,38 @@
-export const AGENT_CARDS = [
+export interface Project {
+  id: string;
+  startup_idea: string;
+  target_market: string | null;
+  market_analysis: string | null;
+  cost_prediction: string | null;
+  business_strategy: string | null;
+  monetization: string | null;
+  legal_considerations: string | null;
+  tech_stack: string | null;
+  strategist_critique: string | null;
+  status: 'pending' | 'analyzing' | 'completed' | 'failed';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AnalysisResult {
+  marketAnalysis: string;
+  costPrediction: string;
+  businessStrategy: string;
+  monetization: string;
+  legalConsiderations: string;
+  techStack: string;
+  strategistCritique: string;
+}
+
+export interface AgentCard {
+  id: keyof AnalysisResult;
+  title: string;
+  icon: string;
+  description: string;
+  color: string;
+}
+
+export const AGENT_CARDS: AgentCard[] = [
   {
     id: 'marketAnalysis',
     title: 'Market Analysis',
