@@ -59,6 +59,12 @@ class AnalyzeView(APIView):
             response_data = {
                 "success": True,
                 "projectId": str(project_id) if project_id else None,
+                "orchestrator": {
+                    "selectedAgents": analysis_result.get("selected_agents", []),
+                    "reasoning": analysis_result.get("orchestrator_reasoning", ""),
+                    "startupCategory": analysis_result.get("startup_category", ""),
+                    "complexityScore": analysis_result.get("complexity_score", 5),
+                },
                 "analysis": {
                     "marketAnalysis": analysis_result["market_analysis"],
                     "costPrediction": analysis_result["cost_prediction"],

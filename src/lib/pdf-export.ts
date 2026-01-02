@@ -244,6 +244,82 @@ function extractCostData(content: string): { label: string; value: number; color
   return data;
 }
 
+// Extract monetization data for visualization
+function extractMonetizationData(content: string): { label: string; value: number; color: [number, number, number] }[] {
+  const colors = [COLORS.chart1, COLORS.chart2, COLORS.chart3, COLORS.chart4];
+  const data: { label: string; value: number; color: [number, number, number] }[] = [];
+  
+  // Look for pricing tiers or revenue projections
+  const patterns = [
+    { regex: /freemium|free tier/i, label: 'Freemium', weight: 15 },
+    { regex: /basic|starter|standard/i, label: 'Basic', weight: 25 },
+    { regex: /pro|professional|growth/i, label: 'Pro', weight: 35 },
+    { regex: /enterprise|premium/i, label: 'Enterprise', weight: 25 },
+  ];
+
+  let colorIndex = 0;
+  for (const pattern of patterns) {
+    if (pattern.regex.test(content)) {
+      data.push({
+        label: pattern.label,
+        value: pattern.weight,
+        color: colors[colorIndex % colors.length]
+      });
+      colorIndex++;
+    }
+  }
+
+  // Default if no patterns found
+  if (data.length < 2) {
+    return [
+      { label: 'Subscription', value: 45, color: COLORS.chart1 },
+      { label: 'One-time', value: 30, color: COLORS.chart2 },
+      { label: 'Services', value: 25, color: COLORS.chart3 },
+    ];
+  }
+
+  return data;
+}
+
+// Extract business strategy timeline data
+function extractStrategyData(content: string): { label: string; value: number; color: [number, number, number] }[] {
+  const colors = [COLORS.chart1, COLORS.chart2, COLORS.chart3, COLORS.chart4, COLORS.chart5];
+  
+  // Look for phase/timeline mentions
+  const phases = [
+    { regex: /phase\s*1|mvp|launch/i, label: 'MVP Launch', value: 20 },
+    { regex: /phase\s*2|growth|scale/i, label: 'Growth', value: 25 },
+    { regex: /phase\s*3|expansion|mature/i, label: 'Expansion', value: 20 },
+    { regex: /marketing|acquisition/i, label: 'Marketing', value: 20 },
+    { regex: /product|development/i, label: 'Product Dev', value: 15 },
+  ];
+
+  const data: { label: string; value: number; color: [number, number, number] }[] = [];
+  let colorIndex = 0;
+
+  for (const phase of phases) {
+    if (phase.regex.test(content)) {
+      data.push({
+        label: phase.label,
+        value: phase.value,
+        color: colors[colorIndex % colors.length]
+      });
+      colorIndex++;
+    }
+  }
+
+  if (data.length < 3) {
+    return [
+      { label: 'Product', value: 30, color: COLORS.chart1 },
+      { label: 'Marketing', value: 25, color: COLORS.chart2 },
+      { label: 'Operations', value: 20, color: COLORS.chart3 },
+      { label: 'Growth', value: 25, color: COLORS.chart4 },
+    ];
+  }
+
+  return data;
+}
+
 // Extract market data for visualization
 function extractMarketData(content: string): { label: string; value: number; color: [number, number, number] }[] {
   const colors = [COLORS.chart1, COLORS.chart2, COLORS.chart3];
@@ -429,6 +505,26 @@ export function exportToPDF(project: Project): void {
       
       const costData = extractCostData(content);
       yPosition = drawPieChart(pdf, margin, yPosition, 25, costData, 'Budget Allocation');
+    }
+
+    if (agent.id === 'monetization' && content) {
+      // Check if we need a new page for the chart
+      if (yPosition > pageHeight - 80) {
+        yPosition = addPage(pdf);
+      }
+      
+      const monetizationData = extractMonetizationData(content);
+      yPosition = drawPieChart(pdf, margin, yPosition, 25, monetizationData, 'Revenue Stream Distribution');
+    }
+
+    if (agent.id === 'businessStrategy' && content) {
+      // Check if we need a new page for the chart
+      if (yPosition > pageHeight - 80) {
+        yPosition = addPage(pdf);
+      }
+      
+      const strategyData = extractStrategyData(content);
+      yPosition = drawBarChart(pdf, margin, yPosition, contentWidth, 50, strategyData, 'Strategic Focus Areas');
     }
 
     // Section content
