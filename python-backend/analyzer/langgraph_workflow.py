@@ -734,12 +734,59 @@ Be constructively brutal. Your goal is to make this plan bulletproof by exposing
 
 
 # =============================================================================
+# Orchestrator Agent Prompt
+# =============================================================================
+
+ORCHESTRATOR_PROMPT = """You are the Orchestrator Agent - a senior startup advisor who decides which specialist agents should analyze a given startup idea.
+
+Based on the startup idea and target market, determine which of these specialist agents are MOST RELEVANT:
+
+AVAILABLE AGENTS:
+1. MARKET_ANALYST - For ideas needing market research, competitor analysis, TAM/SAM/SOM
+2. COST_PREDICTOR - For ideas requiring financial planning, cost breakdown, funding estimates
+3. BUSINESS_STRATEGIST - For ideas needing go-to-market strategy, business model design
+4. MONETIZATION_EXPERT - For ideas requiring revenue models, pricing strategies
+5. LEGAL_ADVISOR - For ideas with regulatory concerns, IP needs, compliance requirements
+6. TECH_ARCHITECT - For tech-focused ideas needing architecture, stack recommendations
+
+RULES:
+- Always include MARKET_ANALYST and BUSINESS_STRATEGIST (core agents)
+- Include COST_PREDICTOR for capital-intensive ideas
+- Include LEGAL_ADVISOR for regulated industries (healthcare, finance, food, etc.)
+- Include TECH_ARCHITECT for software/tech products
+- Include MONETIZATION_EXPERT for B2C or SaaS ideas
+- Skip agents that are clearly not relevant to save time and resources
+
+Respond with a JSON object containing:
+1. "selected_agents": array of agent names to run (from the list above)
+2. "reasoning": brief explanation for each selection/exclusion
+3. "startup_category": categorize the startup (e.g., "SaaS", "Hardware", "Marketplace", "Service", etc.)
+4. "complexity_score": 1-10 rating of idea complexity
+
+Example response:
+{
+  "selected_agents": ["MARKET_ANALYST", "BUSINESS_STRATEGIST", "TECH_ARCHITECT", "MONETIZATION_EXPERT"],
+  "reasoning": "Tech SaaS product requires market analysis, business strategy, technical architecture, and monetization planning. Legal and cost analysis less critical at ideation stage.",
+  "startup_category": "SaaS",
+  "complexity_score": 7
+}
+
+Return ONLY valid JSON, no other text."""
+
+
+# =============================================================================
 # LangGraph State Definition
 # =============================================================================
 
 class AnalysisState(TypedDict):
     startup_idea: str
     target_market: Optional[str]
+    # Orchestrator outputs
+    selected_agents: list
+    orchestrator_reasoning: str
+    startup_category: str
+    complexity_score: int
+    # Agent outputs
     market_analysis: str
     cost_prediction: str
     business_strategy: str
@@ -763,8 +810,48 @@ def create_user_context(state: AnalysisState) -> str:
     return context
 
 
+def orchestrator_node(state: AnalysisState) -> dict:
+    """Orchestrator agent decides which specialists to invoke."""
+    print("🎭 Orchestrator evaluating startup idea...")
+    llm = get_llm()
+    context = create_user_context(state)
+    
+    response = llm.invoke([
+        SystemMessage(content=ORCHESTRATOR_PROMPT),
+        HumanMessage(content=context)
+    ])
+    
+    # Parse JSON response
+    import json
+    try:
+        result = json.loads(response.content)
+        selected = result.get("selected_agents", ["MARKET_ANALYST", "BUSINESS_STRATEGIST"])
+        reasoning = result.get("reasoning", "Default analysis")
+        category = result.get("startup_category", "General")
+        complexity = result.get("complexity_score", 5)
+    except json.JSONDecodeError:
+        # Fallback to all agents if parsing fails
+        selected = ["MARKET_ANALYST", "COST_PREDICTOR", "BUSINESS_STRATEGIST", 
+                   "MONETIZATION_EXPERT", "LEGAL_ADVISOR", "TECH_ARCHITECT"]
+        reasoning = "Full analysis (parsing fallback)"
+        category = "General"
+        complexity = 5
+    
+    print(f"📋 Selected agents: {selected}")
+    return {
+        "selected_agents": selected,
+        "orchestrator_reasoning": reasoning,
+        "startup_category": category,
+        "complexity_score": complexity
+    }
+
+
 def market_analyst_node(state: AnalysisState) -> dict:
     """Market Analyst agent."""
+    if "MARKET_ANALYST" not in state.get("selected_agents", []):
+        print("⏭️ Skipping Market Analyst (not selected)")
+        return {"market_analysis": ""}
+    
     print("🔍 Market Analyst working...")
     llm = get_llm()
     context = create_user_context(state)
@@ -777,6 +864,10 @@ def market_analyst_node(state: AnalysisState) -> dict:
 
 def cost_predictor_node(state: AnalysisState) -> dict:
     """Cost Predictor agent."""
+    if "COST_PREDICTOR" not in state.get("selected_agents", []):
+        print("⏭️ Skipping Cost Predictor (not selected)")
+        return {"cost_prediction": ""}
+    
     print("💰 Cost Predictor working...")
     llm = get_llm()
     context = create_user_context(state)
@@ -789,6 +880,10 @@ def cost_predictor_node(state: AnalysisState) -> dict:
 
 def business_strategist_node(state: AnalysisState) -> dict:
     """Business Strategist agent."""
+    if "BUSINESS_STRATEGIST" not in state.get("selected_agents", []):
+        print("⏭️ Skipping Business Strategist (not selected)")
+        return {"business_strategy": ""}
+    
     print("🎯 Business Strategist working...")
     llm = get_llm()
     context = create_user_context(state)
@@ -801,6 +896,10 @@ def business_strategist_node(state: AnalysisState) -> dict:
 
 def monetization_node(state: AnalysisState) -> dict:
     """Monetization Expert agent."""
+    if "MONETIZATION_EXPERT" not in state.get("selected_agents", []):
+        print("⏭️ Skipping Monetization Expert (not selected)")
+        return {"monetization": ""}
+    
     print("💳 Monetization Expert working...")
     llm = get_llm()
     context = create_user_context(state)
@@ -813,6 +912,10 @@ def monetization_node(state: AnalysisState) -> dict:
 
 def legal_advisor_node(state: AnalysisState) -> dict:
     """Legal Advisor agent."""
+    if "LEGAL_ADVISOR" not in state.get("selected_agents", []):
+        print("⏭️ Skipping Legal Advisor (not selected)")
+        return {"legal_considerations": ""}
+    
     print("⚖️ Legal Advisor working...")
     llm = get_llm()
     context = create_user_context(state)
@@ -825,6 +928,10 @@ def legal_advisor_node(state: AnalysisState) -> dict:
 
 def tech_architect_node(state: AnalysisState) -> dict:
     """Tech Architect agent."""
+    if "TECH_ARCHITECT" not in state.get("selected_agents", []):
+        print("⏭️ Skipping Tech Architect (not selected)")
+        return {"tech_stack": ""}
+    
     print("💻 Tech Architect working...")
     llm = get_llm()
     context = create_user_context(state)
@@ -927,11 +1034,14 @@ Based on this feedback, provide a refined final strategy that addresses the vali
 # =============================================================================
 
 def build_analysis_graph() -> StateGraph:
-    """Build the multi-agent analysis graph."""
+    """Build the multi-agent analysis graph with orchestrator."""
     
     workflow = StateGraph(AnalysisState)
     
-    # Add all agent nodes
+    # Add orchestrator as entry point
+    workflow.add_node("orchestrator", orchestrator_node)
+    
+    # Add all specialist agent nodes
     workflow.add_node("market_analyst", market_analyst_node)
     workflow.add_node("cost_predictor", cost_predictor_node)
     workflow.add_node("business_strategist", business_strategist_node)
@@ -942,10 +1052,11 @@ def build_analysis_graph() -> StateGraph:
     workflow.add_node("critic_review", critic_review_node)
     workflow.add_node("final_refinement", final_refinement_node)
     
-    # Set entry point
-    workflow.set_entry_point("market_analyst")
+    # Set entry point to orchestrator
+    workflow.set_entry_point("orchestrator")
     
-    # Phase 1: Run 6 specialist agents sequentially
+    # Orchestrator -> specialist agents (sequential for memory efficiency)
+    workflow.add_edge("orchestrator", "market_analyst")
     workflow.add_edge("market_analyst", "cost_predictor")
     workflow.add_edge("cost_predictor", "business_strategist")
     workflow.add_edge("business_strategist", "monetization")
@@ -969,20 +1080,24 @@ def build_analysis_graph() -> StateGraph:
 
 def run_analysis(startup_idea: str, target_market: Optional[str] = None) -> dict:
     """
-    Run the complete multi-agent analysis workflow.
+    Run the complete multi-agent analysis workflow with orchestrator.
     
     Args:
         startup_idea: The startup idea to analyze
         target_market: Optional target market specification
         
     Returns:
-        Dictionary containing all analysis results
+        Dictionary containing all analysis results including orchestrator metadata
     """
     graph = build_analysis_graph()
     
     initial_state: AnalysisState = {
         "startup_idea": startup_idea,
         "target_market": target_market,
+        "selected_agents": [],
+        "orchestrator_reasoning": "",
+        "startup_category": "",
+        "complexity_score": 0,
         "market_analysis": "",
         "cost_prediction": "",
         "business_strategy": "",
@@ -997,6 +1112,12 @@ def run_analysis(startup_idea: str, target_market: Optional[str] = None) -> dict
     final_state = graph.invoke(initial_state)
     
     return {
+        # Orchestrator metadata
+        "selected_agents": final_state["selected_agents"],
+        "orchestrator_reasoning": final_state["orchestrator_reasoning"],
+        "startup_category": final_state["startup_category"],
+        "complexity_score": final_state["complexity_score"],
+        # Analysis results
         "market_analysis": final_state["market_analysis"],
         "cost_prediction": final_state["cost_prediction"],
         "business_strategy": final_state["business_strategy"],
