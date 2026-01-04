@@ -522,9 +522,9 @@ REQUIRED SECTIONS:
    - CA/CS retainer fees
    - Compliance software
 
-Be thorough and specific to Indian law. Include actionable recommendations and estimated costs in INR.
+Be thorough and specific to Indian law. Include actionable recommendations and estimated costs in INR."""
 
-TECH_ARCHITECT_PROMPT = """You are a Principal Technology Architect with 25+ years of experience building scalable systems for startups and enterprises. You've architected systems handling millions of users and billions of transactions.
+TECH_ARCHITECT_PROMPT = """You are a Principal Technology Architect with 25+ years of experience building scalable systems for startups and enterprises. You have architected systems handling millions of users and billions of transactions.
 
 Design an EXTREMELY COMPREHENSIVE technology architecture for this startup idea.
 
