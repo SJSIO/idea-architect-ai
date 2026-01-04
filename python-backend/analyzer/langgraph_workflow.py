@@ -34,10 +34,6 @@ def get_llm(agent_name: str = 'default'):
         ChatGroq instance configured with the appropriate API key
     """
     from .api_key_manager import get_key_for_agent
-    import time
-    
-    # Add delay between agent calls to avoid rate limits
-    time.sleep(2)
     
     api_key = get_key_for_agent(agent_name)
     
@@ -296,6 +292,79 @@ REQUIRED SECTIONS:
 
 Be specific, actionable, and bold. Include frameworks, metrics, and concrete action items throughout."""
 
+MONETIZATION_PROMPT = """You are a Monetization Strategy Expert who has designed pricing models for companies from startups to Fortune 500. You understand psychology, value-based pricing, and sustainable revenue models.
+
+Develop FOUR comprehensive monetization strategies for this startup idea. Each should be detailed enough to implement immediately.
+
+FOR EACH MONETIZATION MODEL, PROVIDE:
+
+MODEL 1: [Primary Recommendation]
+   
+   A. Model Overview
+      - Model name and type
+      - Core mechanics explanation
+      - Why this fits the product
+      - Target customer segment
+   
+   B. Pricing Architecture
+      - Tier 1: Free/Freemium (features, limits, purpose)
+      - Tier 2: Basic/Starter (price, features, target user)
+      - Tier 3: Professional/Growth (price, features, target user)
+      - Tier 4: Enterprise (custom pricing, features, target user)
+      - Add-ons and upsells
+   
+   C. Revenue Projections
+      - Year 1: Monthly and annual projections
+      - Year 2: Growth assumptions and projections
+      - Year 3: Scale assumptions and projections
+      - Conversion rate assumptions
+      - Churn rate assumptions
+      - Average Revenue Per User (ARPU)
+   
+   D. Implementation Details
+      - Technical requirements
+      - Billing system needs
+      - Contract terms
+      - Payment methods
+   
+   E. Pros & Cons Analysis
+      - Advantages (5+)
+      - Disadvantages and risks (5+)
+      - Mitigation strategies
+
+MODEL 2: [Alternative Approach]
+   [Same detailed structure as above]
+
+MODEL 3: [Experimental/Innovative Model]
+   [Same detailed structure as above]
+
+MODEL 4: [Hybrid Model]
+   [Combine elements of above models]
+   [Same detailed structure]
+
+ADDITIONAL SECTIONS:
+
+PRICING PSYCHOLOGY RECOMMENDATIONS
+- Anchoring strategies
+- Decoy pricing opportunities
+- Value framing techniques
+- Social proof integration
+
+MONETIZATION ROADMAP
+- Phase 1: Launch pricing
+- Phase 2: Price optimization
+- Phase 3: Enterprise pricing
+- Phase 4: International pricing
+
+METRICS TO TRACK
+- Monthly Recurring Revenue (MRR)
+- Annual Recurring Revenue (ARR)
+- Customer Lifetime Value (LTV)
+- Customer Acquisition Cost (CAC)
+- Net Revenue Retention
+- Expansion Revenue
+
+Include specific dollar amounts, percentages, and realistic projections based on industry benchmarks."""
 
 LEGAL_ADVISOR_PROMPT = """You are a Senior Legal Counsel specializing in INDIAN startup law, corporate governance, intellectual property, and regulatory compliance. You've advised hundreds of Indian startups from incorporation to IPO/acquisition.
 
@@ -455,6 +524,266 @@ REQUIRED SECTIONS:
 
 Be thorough and specific to Indian law. Include actionable recommendations and estimated costs in INR."""
 
+TECH_ARCHITECT_PROMPT = """You are a Principal Technology Architect with 25+ years of experience building scalable systems for startups and enterprises. You have architected systems handling millions of users and billions of transactions.
+
+Design an EXTREMELY COMPREHENSIVE technology architecture for this startup idea.
+
+REQUIRED SECTIONS:
+
+1. ARCHITECTURE OVERVIEW
+   - High-level system architecture description
+   - Architectural patterns chosen (microservices, monolith, serverless, etc.)
+   - Scalability considerations
+   - Key architectural decisions and rationale
+
+2. FRONTEND ARCHITECTURE
+   
+   A. Framework Selection
+      - Recommended framework: [e.g., React, Next.js, Vue.js]
+      - Justification and alternatives considered
+      - Version and key dependencies
+   
+   B. UI Component Strategy
+      - Component library choice
+      - Design system approach
+      - Styling solution (Tailwind, CSS-in-JS, etc.)
+   
+   C. State Management
+      - Solution choice and justification
+      - Data flow patterns
+      - Caching strategy
+   
+   D. Performance Optimization
+      - Code splitting approach
+      - Lazy loading strategy
+      - Image optimization
+      - Core Web Vitals targets
+
+3. BACKEND ARCHITECTURE
+   
+   A. Language & Framework
+      - Primary language: [e.g., Node.js, Python, Go]
+      - Framework: [e.g., Express, FastAPI, Gin]
+      - Justification and alternatives
+   
+   B. API Design
+      - API style (REST, GraphQL, gRPC)
+      - Versioning strategy
+      - Rate limiting approach
+      - Documentation (OpenAPI/Swagger)
+   
+   C. Authentication & Authorization
+      - Auth solution (Auth0, Firebase, custom)
+      - Token strategy (JWT, sessions)
+      - RBAC implementation
+      - OAuth2/OIDC integration
+
+4. DATABASE ARCHITECTURE
+   
+   A. Primary Database
+      - Technology choice (PostgreSQL, MongoDB, etc.)
+      - Data modeling approach
+      - Schema design principles
+      - Indexing strategy
+   
+   B. Caching Layer
+      - Caching solution (Redis, Memcached)
+      - Cache invalidation strategy
+      - Cache-aside vs write-through
+   
+   C. Search (if applicable)
+      - Search engine choice
+      - Indexing approach
+   
+   D. Data Scaling
+      - Sharding strategy
+      - Read replicas
+      - Connection pooling
+
+5. CLOUD INFRASTRUCTURE
+   
+   A. Cloud Provider Recommendation
+      - Primary provider and justification
+      - Multi-cloud considerations
+      - Cost optimization strategies
+   
+   B. Core Services
+      - Compute (containers, serverless, VMs)
+      - Storage solutions
+      - CDN configuration
+      - DNS and domain management
+   
+   C. Infrastructure as Code
+      - IaC tool choice (Terraform, Pulumi, CloudFormation)
+      - Environment management
+      - Secrets management
+
+6. DEVOPS & CI/CD
+   
+   A. Development Workflow
+      - Git branching strategy
+      - Code review process
+      - Testing requirements
+   
+   B. CI/CD Pipeline
+      - Pipeline stages
+      - Testing automation
+      - Deployment strategies (blue-green, canary)
+   
+   C. Monitoring & Observability
+      - Logging solution
+      - Metrics collection
+      - Alerting strategy
+      - APM tools
+
+7. SECURITY ARCHITECTURE
+   
+   - Security principles applied
+   - OWASP considerations
+   - Encryption (at rest, in transit)
+   - Security scanning and auditing
+   - Incident response preparation
+
+8. THIRD-PARTY INTEGRATIONS
+   
+   - Payment processing recommendation
+   - Email service provider
+   - SMS/Notification services
+   - Analytics and tracking
+   - Error monitoring
+   - Feature flags
+
+9. MVP DEVELOPMENT PLAN
+   
+   Phase 1: Foundation (Weeks 1-4)
+   - [Specific deliverables]
+   
+   Phase 2: Core Features (Weeks 5-8)
+   - [Specific deliverables]
+   
+   Phase 3: Launch Ready (Weeks 9-12)
+   - [Specific deliverables]
+
+10. TEAM COMPOSITION
+    
+    MVP Team:
+    - Roles needed with responsibilities
+    - Skill requirements
+    - Hiring vs outsourcing recommendations
+    
+    Scale Team:
+    - Additional roles for growth phase
+    - Organizational structure
+
+11. TECHNOLOGY BUDGET ESTIMATE
+    
+    - Monthly infrastructure costs (by tier)
+    - Development tool costs
+    - Third-party service costs
+    - Scaling cost projections
+
+Include architecture diagrams descriptions, specific technology versions, and cost estimates throughout."""
+
+STRATEGIST_PROMPT = """You are the Chief Strategy Officer synthesizing insights from a world-class team of specialists into a unified, actionable strategic plan.
+
+Based on all the analyses provided, create a COMPREHENSIVE synthesized strategic plan that:
+
+1. EXECUTIVE SYNTHESIS
+   - Key insights from each specialist
+   - Critical success factors identified
+   - Primary risks and opportunities
+   - Strategic priorities ranking
+
+2. INTEGRATED STRATEGIC FRAMEWORK
+   - How market, financial, and technical strategies align
+   - Dependencies between different elements
+   - Synergies identified
+   - Conflicts resolved
+
+3. PRIORITIZED ACTION ROADMAP
+   - Immediate actions (Week 1-2)
+   - Short-term priorities (Month 1)
+   - Medium-term goals (Months 2-6)
+   - Long-term objectives (6-18 months)
+
+4. RESOURCE ALLOCATION
+   - Budget allocation across areas
+   - Team priorities
+   - Time investment recommendations
+
+5. SUCCESS METRICS DASHBOARD
+   - North Star metric
+   - Key Performance Indicators by area
+   - Milestones and checkpoints
+
+6. RISK MITIGATION MATRIX
+   - Top risks with probability and impact
+   - Mitigation strategies
+   - Contingency plans
+
+7. 90-DAY EXECUTION PLAYBOOK
+   - Week-by-week action items
+   - Decision points
+   - Review cadence
+
+Be specific, actionable, and ensure all elements work together cohesively."""
+
+CRITIC_PROMPT = """You are a seasoned Devil's Advocate and Critical Analyst with a track record of identifying blind spots that cause startups to fail.
+
+Your role is to RIGOROUSLY stress-test the strategic plan and identify ALL potential weaknesses.
+
+CRITICAL ANALYSIS FRAMEWORK:
+
+1. ASSUMPTION AUDIT
+   - List every major assumption in the plan
+   - Rate each assumption's validity (Strong/Moderate/Weak)
+   - Identify unverified or risky assumptions
+   - Recommend validation approaches
+
+2. RISK DEEP DIVE
+   - Market risks: What if the market doesn't respond as expected?
+   - Competitive risks: What moves could competitors make?
+   - Execution risks: What could go wrong operationally?
+   - Financial risks: Cash flow and funding concerns
+   - Technical risks: Technology implementation challenges
+   - Team risks: People and capability gaps
+   - Regulatory risks: Compliance and legal threats
+
+3. GAP ANALYSIS
+   - What's missing from the analysis?
+   - What scenarios weren't considered?
+   - What data would strengthen the plan?
+   - What expertise is lacking?
+
+4. MARKET REALITY CHECK
+   - Is the market sizing realistic?
+   - Are customer acquisition assumptions valid?
+   - Is the competitive analysis complete?
+   - Are the growth projections achievable?
+
+5. EXECUTION FEASIBILITY
+   - Is the timeline realistic?
+   - Are the resource requirements accurate?
+   - Can the team actually deliver this?
+   - What are the hardest parts to execute?
+
+6. ALTERNATIVE PERSPECTIVES
+   - What other approaches might work better?
+   - What would a skeptical investor say?
+   - What would a direct competitor think?
+   - What would a potential customer question?
+
+7. FAILURE MODE ANALYSIS
+   - Most likely ways this could fail
+   - Early warning signs to watch
+   - Circuit breakers and pivot triggers
+
+8. RECOMMENDATIONS FOR IMPROVEMENT
+   - Priority fixes (must address before launch)
+   - Important improvements (address within 90 days)
+   - Nice-to-haves (consider for future)
+
+Be constructively brutal. Your goal is to make this plan bulletproof by exposing every weakness NOW."""
 
 
 # =============================================================================
@@ -469,12 +798,16 @@ AVAILABLE AGENTS:
 1. MARKET_ANALYST - For ideas needing market research, competitor analysis, TAM/SAM/SOM
 2. COST_PREDICTOR - For ideas requiring financial planning, cost breakdown, funding estimates
 3. BUSINESS_STRATEGIST - For ideas needing go-to-market strategy, business model design
-4. LEGAL_ADVISOR - For ideas with regulatory concerns, IP needs, compliance requirements
+4. MONETIZATION_EXPERT - For ideas requiring revenue models, pricing strategies
+5. LEGAL_ADVISOR - For ideas with regulatory concerns, IP needs, compliance requirements
+6. TECH_ARCHITECT - For tech-focused ideas needing architecture, stack recommendations
 
 RULES:
 - Always include MARKET_ANALYST and BUSINESS_STRATEGIST (core agents)
 - Include COST_PREDICTOR for capital-intensive ideas
 - Include LEGAL_ADVISOR for regulated industries (healthcare, finance, food, etc.)
+- Include TECH_ARCHITECT for software/tech products
+- Include MONETIZATION_EXPERT for B2C or SaaS ideas
 - Skip agents that are clearly not relevant to save time and resources
 
 Respond with a JSON object containing:
@@ -485,8 +818,8 @@ Respond with a JSON object containing:
 
 Example response:
 {
-  "selected_agents": ["MARKET_ANALYST", "BUSINESS_STRATEGIST", "COST_PREDICTOR", "LEGAL_ADVISOR"],
-  "reasoning": "This idea requires market analysis, business strategy, cost planning, and legal compliance. All core agents are relevant.",
+  "selected_agents": ["MARKET_ANALYST", "BUSINESS_STRATEGIST", "TECH_ARCHITECT", "MONETIZATION_EXPERT"],
+  "reasoning": "Tech SaaS product requires market analysis, business strategy, technical architecture, and monetization planning. Legal and cost analysis less critical at ideation stage.",
   "startup_category": "SaaS",
   "complexity_score": 7
 }
@@ -510,7 +843,12 @@ class AnalysisState(TypedDict):
     market_analysis: str
     cost_prediction: str
     business_strategy: str
+    monetization: str
     legal_considerations: str
+    tech_stack: str
+    strategist_synthesis: str
+    critic_review: str
+    final_strategy: str
 
 
 # =============================================================================
@@ -546,7 +884,8 @@ def orchestrator_node(state: AnalysisState) -> dict:
         complexity = result.get("complexity_score", 5)
     except json.JSONDecodeError:
         # Fallback to all agents if parsing fails
-        selected = ["MARKET_ANALYST", "COST_PREDICTOR", "BUSINESS_STRATEGIST", "LEGAL_ADVISOR"]
+        selected = ["MARKET_ANALYST", "COST_PREDICTOR", "BUSINESS_STRATEGIST", 
+                   "MONETIZATION_EXPERT", "LEGAL_ADVISOR", "TECH_ARCHITECT"]
         reasoning = "Full analysis (parsing fallback)"
         category = "General"
         complexity = 5
@@ -638,6 +977,22 @@ def business_strategist_node(state: AnalysisState) -> dict:
     return {"business_strategy": response.content}
 
 
+def monetization_node(state: AnalysisState) -> dict:
+    """Monetization Expert agent."""
+    if "MONETIZATION_EXPERT" not in state.get("selected_agents", []):
+        print("⏭️ Skipping Monetization Expert (not selected)")
+        return {"monetization": ""}
+    
+    print("💳 Monetization Expert working...")
+    llm = get_llm('monetization')
+    context = create_user_context(state)
+    response = llm.invoke([
+        SystemMessage(content=MONETIZATION_PROMPT),
+        HumanMessage(content=context)
+    ])
+    return {"monetization": response.content}
+
+
 def legal_advisor_node(state: AnalysisState) -> dict:
     """Legal Advisor agent with RAG-enhanced Indian legal knowledge."""
     if "LEGAL_ADVISOR" not in state.get("selected_agents", []):
@@ -669,6 +1024,107 @@ def legal_advisor_node(state: AnalysisState) -> dict:
     return {"legal_considerations": response.content}
 
 
+def tech_architect_node(state: AnalysisState) -> dict:
+    """Tech Architect agent."""
+    if "TECH_ARCHITECT" not in state.get("selected_agents", []):
+        print("⏭️ Skipping Tech Architect (not selected)")
+        return {"tech_stack": ""}
+    
+    print("💻 Tech Architect working...")
+    llm = get_llm('tech_architect')
+    context = create_user_context(state)
+    response = llm.invoke([
+        SystemMessage(content=TECH_ARCHITECT_PROMPT),
+        HumanMessage(content=context)
+    ])
+    return {"tech_stack": response.content}
+
+
+def strategist_synthesis_node(state: AnalysisState) -> dict:
+    """Strategist synthesizes all agent outputs."""
+    print("🔮 Strategist synthesizing insights...")
+    llm = get_llm('strategist_synthesis')
+    
+    synthesis_context = f"""
+Original Startup Idea: {state['startup_idea']}
+{f"Target Market: {state['target_market']}" if state.get('target_market') else ""}
+
+=== MARKET ANALYSIS ===
+{state['market_analysis']}
+
+=== COST PREDICTION ===
+{state['cost_prediction']}
+
+=== BUSINESS STRATEGY ===
+{state['business_strategy']}
+
+=== MONETIZATION MODELS ===
+{state['monetization']}
+
+=== LEGAL CONSIDERATIONS ===
+{state['legal_considerations']}
+
+=== TECHNOLOGY STACK ===
+{state['tech_stack']}
+"""
+    
+    response = llm.invoke([
+        SystemMessage(content=STRATEGIST_PROMPT),
+        HumanMessage(content=synthesis_context)
+    ])
+    return {"strategist_synthesis": response.content}
+
+
+def critic_review_node(state: AnalysisState) -> dict:
+    """Critic reviews and challenges the strategist's plan."""
+    print("🔍 Critic reviewing the plan...")
+    llm = get_llm('critic_review')
+    
+    critic_context = f"""
+Original Startup Idea: {state['startup_idea']}
+
+=== STRATEGIST'S SYNTHESIZED PLAN ===
+{state['strategist_synthesis']}
+
+=== KEY DATA FROM ANALYSES ===
+Market Analysis Summary: {state['market_analysis'][:2000]}...
+Cost Estimates: {state['cost_prediction'][:2000]}...
+"""
+    
+    response = llm.invoke([
+        SystemMessage(content=CRITIC_PROMPT),
+        HumanMessage(content=critic_context)
+    ])
+    return {"critic_review": response.content}
+
+
+def final_refinement_node(state: AnalysisState) -> dict:
+    """Strategist refines plan based on critic feedback."""
+    print("✨ Generating final refined strategy...")
+    llm = get_llm('final_refinement')
+    
+    refinement_prompt = """You are the Senior Business Strategist again.
+Review the Critic's feedback and refine your strategic plan.
+Address the valid concerns raised while maintaining the core strategy's strengths.
+Create a FINAL, battle-tested strategic plan that is comprehensive and actionable.
+
+Format your response clearly with headers and bullet points. Do not use asterisks for emphasis - use clear section headers instead."""
+
+    refinement_context = f"""
+=== YOUR ORIGINAL SYNTHESIZED PLAN ===
+{state['strategist_synthesis']}
+
+=== CRITIC'S REVIEW ===
+{state['critic_review']}
+
+Based on this feedback, provide a refined final strategy that addresses the valid concerns while maintaining strategic coherence.
+"""
+    
+    response = llm.invoke([
+        SystemMessage(content=refinement_prompt),
+        HumanMessage(content=refinement_context)
+    ])
+    return {"final_strategy": response.content}
 
 
 # =============================================================================
@@ -687,19 +1143,35 @@ def build_analysis_graph() -> StateGraph:
     workflow.add_node("market_analyst", market_analyst_node)
     workflow.add_node("cost_predictor", cost_predictor_node)
     workflow.add_node("business_strategist", business_strategist_node)
+    workflow.add_node("monetization", monetization_node)
     workflow.add_node("legal_advisor", legal_advisor_node)
+    workflow.add_node("tech_architect", tech_architect_node)
+    workflow.add_node("strategist_synthesis", strategist_synthesis_node)
+    workflow.add_node("critic_review", critic_review_node)
+    workflow.add_node("final_refinement", final_refinement_node)
     
     # Set entry point to orchestrator
     workflow.set_entry_point("orchestrator")
     
-    # Orchestrator -> specialist agents (sequential for rate limit management)
+    # Orchestrator -> specialist agents (sequential for memory efficiency)
     workflow.add_edge("orchestrator", "market_analyst")
     workflow.add_edge("market_analyst", "cost_predictor")
     workflow.add_edge("cost_predictor", "business_strategist")
-    workflow.add_edge("business_strategist", "legal_advisor")
+    workflow.add_edge("business_strategist", "monetization")
+    workflow.add_edge("monetization", "legal_advisor")
+    workflow.add_edge("legal_advisor", "tech_architect")
     
-    # End after legal advisor
-    workflow.add_edge("legal_advisor", END)
+    # Phase 2: Strategist synthesizes all outputs
+    workflow.add_edge("tech_architect", "strategist_synthesis")
+    
+    # Phase 3: Critic reviews the synthesis
+    workflow.add_edge("strategist_synthesis", "critic_review")
+    
+    # Phase 4: Final refinement based on criticism
+    workflow.add_edge("critic_review", "final_refinement")
+    
+    # End the workflow
+    workflow.add_edge("final_refinement", END)
     
     return workflow.compile()
 
@@ -727,7 +1199,12 @@ def run_analysis(startup_idea: str, target_market: Optional[str] = None) -> dict
         "market_analysis": "",
         "cost_prediction": "",
         "business_strategy": "",
+        "monetization": "",
         "legal_considerations": "",
+        "tech_stack": "",
+        "strategist_synthesis": "",
+        "critic_review": "",
+        "final_strategy": "",
     }
     
     final_state = graph.invoke(initial_state)
@@ -739,8 +1216,11 @@ def run_analysis(startup_idea: str, target_market: Optional[str] = None) -> dict
         "startup_category": final_state["startup_category"],
         "complexity_score": final_state["complexity_score"],
         # Analysis results
-        "marketAnalysis": final_state["market_analysis"],
-        "costPrediction": final_state["cost_prediction"],
-        "businessStrategy": final_state["business_strategy"],
-        "legalConsiderations": final_state["legal_considerations"],
+        "market_analysis": final_state["market_analysis"],
+        "cost_prediction": final_state["cost_prediction"],
+        "business_strategy": final_state["business_strategy"],
+        "monetization": final_state["monetization"],
+        "legal_considerations": final_state["legal_considerations"],
+        "tech_stack": final_state["tech_stack"],
+        "strategist_critique": final_state["final_strategy"],
     }

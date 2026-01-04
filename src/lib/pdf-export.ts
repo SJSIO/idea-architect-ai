@@ -457,7 +457,10 @@ export function exportToPDF(project: Project): void {
     marketAnalysis: project.market_analysis,
     costPrediction: project.cost_prediction,
     businessStrategy: project.business_strategy,
+    monetization: project.monetization,
     legalConsiderations: project.legal_considerations,
+    techStack: project.tech_stack,
+    strategistCritique: project.strategist_critique,
   };
 
   for (const agent of AGENT_CARDS) {
@@ -504,6 +507,15 @@ export function exportToPDF(project: Project): void {
       yPosition = drawPieChart(pdf, margin, yPosition, 25, costData, 'Budget Allocation');
     }
 
+    if (agent.id === 'monetization' && content) {
+      // Check if we need a new page for the chart
+      if (yPosition > pageHeight - 80) {
+        yPosition = addPage(pdf);
+      }
+      
+      const monetizationData = extractMonetizationData(content);
+      yPosition = drawPieChart(pdf, margin, yPosition, 25, monetizationData, 'Revenue Stream Distribution');
+    }
 
     if (agent.id === 'businessStrategy' && content) {
       // Check if we need a new page for the chart

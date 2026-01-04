@@ -48,7 +48,7 @@ export default function NewAnalysis() {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast({
         title: 'Analysis Complete',
-        description: 'Your startup idea has been analyzed by 4 AI agents.',
+        description: 'Your startup idea has been analyzed by 6 AI agents.',
       });
       navigate(`/project/${projectId}`);
     },
@@ -87,8 +87,8 @@ export default function NewAnalysis() {
             Analyze Your <span className="gradient-text">Startup Idea</span>
           </h1>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            Our AI agents will analyze your idea across 4 key dimensions 
-            for comprehensive startup insights.
+            Our AI agents will analyze your idea across 6 key dimensions, 
+            then debate and refine the strategy for maximum insight.
           </p>
         </div>
 
@@ -162,9 +162,9 @@ export default function NewAnalysis() {
 
         <div className="mt-8 grid grid-cols-3 gap-4 opacity-0 animate-fade-in stagger-3">
           {[
-            { icon: '🤖', label: '4 AI Agents', desc: 'Specialized analysis' },
-            { icon: '📈', label: 'Market Focus', desc: 'India-centric data' },
-            { icon: '📊', label: 'Comprehensive', desc: 'Market to Legal' },
+            { icon: '🤖', label: '6 AI Agents', desc: 'Specialized analysis' },
+            { icon: '⚔️', label: 'Debate Loop', desc: 'Strategist vs Critic' },
+            { icon: '📊', label: 'Comprehensive', desc: 'Market to Tech' },
           ].map((feature) => (
             <Card key={feature.label} className="bg-card/30 border-border/30 text-center p-4">
               <span className="text-2xl mb-2 block">{feature.icon}</span>

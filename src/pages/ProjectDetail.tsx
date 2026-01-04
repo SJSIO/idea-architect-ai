@@ -109,7 +109,10 @@ export default function ProjectDetail() {
     marketAnalysis: project.market_analysis,
     costPrediction: project.cost_prediction,
     businessStrategy: project.business_strategy,
+    monetization: project.monetization,
     legalConsiderations: project.legal_considerations,
+    techStack: project.tech_stack,
+    strategistCritique: project.strategist_critique,
   };
 
   return (
