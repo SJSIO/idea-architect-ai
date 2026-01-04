@@ -17,19 +17,24 @@ import os
 
 
 # =============================================================================
-# LLM Configuration (Using Groq Cloud API)
+# LLM Configuration (Using Groq Cloud API with Multi-Key Support)
 # =============================================================================
 
-def get_llm():
-    """Get the configured Groq LLM instance.
+def get_llm(agent_name: str = 'default'):
+    """Get the configured Groq LLM instance with agent-specific API key.
     
-    Using llama-3.1-8b-instant to reduce memory usage on Render free tier.
-    This model is faster and uses significantly less memory.
+    Uses multiple API keys to distribute load across different agents
+    and avoid rate limits.
+    
+    Args:
+        agent_name: Name of the agent requesting the LLM (for key selection)
+    
+    Returns:
+        ChatGroq instance configured with the appropriate API key
     """
-    api_key = settings.GROQ_API_KEY or os.getenv('GROQ_API_KEY')
+    from .api_key_manager import get_key_for_agent
     
-    if not api_key:
-        raise ValueError("GROQ_API_KEY is not configured. Set it in your environment variables.")
+    api_key = get_key_for_agent(agent_name)
     
     return ChatGroq(
         model_name="llama-3.1-8b-instant",
@@ -860,7 +865,7 @@ def create_user_context(state: AnalysisState) -> str:
 def orchestrator_node(state: AnalysisState) -> dict:
     """Orchestrator agent decides which specialists to invoke."""
     print("🎭 Orchestrator evaluating startup idea...")
-    llm = get_llm()
+    llm = get_llm('orchestrator')
     context = create_user_context(state)
     
     response = llm.invoke([
@@ -911,7 +916,7 @@ def market_analyst_node(state: AnalysisState) -> dict:
     except Exception as e:
         print(f"⚠️ RAG query failed (continuing without context): {e}")
     
-    llm = get_llm()
+    llm = get_llm('market_analyst')
     context = create_user_context(state)
     
     # Format prompt with RAG context
@@ -942,7 +947,7 @@ def cost_predictor_node(state: AnalysisState) -> dict:
     except Exception as e:
         print(f"⚠️ RAG query failed (continuing without context): {e}")
     
-    llm = get_llm()
+    llm = get_llm('cost_predictor')
     context = create_user_context(state)
     
     # Format prompt with RAG context
@@ -962,7 +967,7 @@ def business_strategist_node(state: AnalysisState) -> dict:
         return {"business_strategy": ""}
     
     print("🎯 Business Strategist working...")
-    llm = get_llm()
+    llm = get_llm('business_strategist')
     context = create_user_context(state)
     response = llm.invoke([
         SystemMessage(content=BUSINESS_STRATEGIST_PROMPT),
@@ -978,7 +983,7 @@ def monetization_node(state: AnalysisState) -> dict:
         return {"monetization": ""}
     
     print("💳 Monetization Expert working...")
-    llm = get_llm()
+    llm = get_llm('monetization')
     context = create_user_context(state)
     response = llm.invoke([
         SystemMessage(content=MONETIZATION_PROMPT),
@@ -1005,7 +1010,7 @@ def legal_advisor_node(state: AnalysisState) -> dict:
     except Exception as e:
         print(f"⚠️ RAG query failed (continuing without context): {e}")
     
-    llm = get_llm()
+    llm = get_llm('legal_advisor')
     context = create_user_context(state)
     
     # Format prompt with RAG context
@@ -1025,7 +1030,7 @@ def tech_architect_node(state: AnalysisState) -> dict:
         return {"tech_stack": ""}
     
     print("💻 Tech Architect working...")
-    llm = get_llm()
+    llm = get_llm('tech_architect')
     context = create_user_context(state)
     response = llm.invoke([
         SystemMessage(content=TECH_ARCHITECT_PROMPT),
@@ -1037,7 +1042,7 @@ def tech_architect_node(state: AnalysisState) -> dict:
 def strategist_synthesis_node(state: AnalysisState) -> dict:
     """Strategist synthesizes all agent outputs."""
     print("🔮 Strategist synthesizing insights...")
-    llm = get_llm()
+    llm = get_llm('strategist_synthesis')
     
     synthesis_context = f"""
 Original Startup Idea: {state['startup_idea']}
@@ -1072,7 +1077,7 @@ Original Startup Idea: {state['startup_idea']}
 def critic_review_node(state: AnalysisState) -> dict:
     """Critic reviews and challenges the strategist's plan."""
     print("🔍 Critic reviewing the plan...")
-    llm = get_llm()
+    llm = get_llm('critic_review')
     
     critic_context = f"""
 Original Startup Idea: {state['startup_idea']}
@@ -1095,7 +1100,7 @@ Cost Estimates: {state['cost_prediction'][:2000]}...
 def final_refinement_node(state: AnalysisState) -> dict:
     """Strategist refines plan based on critic feedback."""
     print("✨ Generating final refined strategy...")
-    llm = get_llm()
+    llm = get_llm('final_refinement')
     
     refinement_prompt = """You are the Senior Business Strategist again.
 Review the Critic's feedback and refine your strategic plan.

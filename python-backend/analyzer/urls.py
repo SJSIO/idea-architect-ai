@@ -9,6 +9,7 @@ from .views import (
     knowledge_status,
     knowledge_locations,
     refresh_knowledge,
+    api_key_status,
 )
 
 router = DefaultRouter()
@@ -22,5 +23,7 @@ urlpatterns = [
     path('knowledge/status', knowledge_status, name='knowledge-status'),
     path('knowledge/locations', knowledge_locations, name='knowledge-locations'),
     path('knowledge/refresh', refresh_knowledge, name='knowledge-refresh'),
+    # API key management
+    path('api-keys/status', api_key_status, name='api-keys-status'),
     path('', include(router.urls)),
 ]

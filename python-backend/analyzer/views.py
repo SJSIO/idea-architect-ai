@@ -105,8 +105,27 @@ def api_root(request):
             "knowledge": "/knowledge",
             "knowledge_status": "/knowledge/status",
             "knowledge_locations": "/knowledge/locations",
+            "api_keys_status": "/api-keys/status",
         }
     })
+
+
+@api_view(['GET'])
+def api_key_status(request):
+    """Get status of configured Groq API keys."""
+    from .api_key_manager import get_key_status
+    
+    try:
+        status = get_key_status()
+        return Response({
+            "success": True,
+            "status": status
+        })
+    except Exception as e:
+        return Response({
+            "success": False,
+            "error": str(e)
+        }, status=500)
 
 
 # =============================================================================
