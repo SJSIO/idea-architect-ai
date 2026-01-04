@@ -151,7 +151,7 @@ def load_documents_from_directory(directory: Path) -> List:
 def chunk_documents(documents: List, chunk_size: int = CHUNK_SIZE, 
                    chunk_overlap: int = CHUNK_OVERLAP) -> List:
     """Split documents into chunks for better retrieval."""
-    from langchain.text_splitter import RecursiveCharacterTextSplitter
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
     
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
