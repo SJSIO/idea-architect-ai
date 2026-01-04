@@ -73,7 +73,7 @@ def get_chroma_client():
 def get_embeddings():
     """Get the sentence-transformers embedding function."""
     try:
-        from langchain_community.embeddings import HuggingFaceEmbeddings
+        from langchain_huggingface import HuggingFaceEmbeddings
         return HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
     except Exception as e:
         logger.error(f"Error loading embeddings: {e}")
