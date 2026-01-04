@@ -1040,32 +1040,61 @@ def tech_architect_node(state: AnalysisState) -> dict:
     return {"tech_stack": response.content}
 
 
+def truncate_with_context(text: str, max_chars: int = 2500, preserve_headers: bool = True) -> str:
+    """
+    Truncate text while preserving structure and key information.
+    Keeps headers and first paragraph under each header.
+    """
+    if not text or len(text) <= max_chars:
+        return text
+    
+    if preserve_headers:
+        lines = text.split('\n')
+        result = []
+        current_length = 0
+        
+        for line in lines:
+            # Always keep headers (lines starting with # or all caps)
+            is_header = line.strip().startswith('#') or (line.strip().isupper() and len(line.strip()) > 3)
+            
+            if current_length + len(line) > max_chars and not is_header:
+                break
+            
+            result.append(line)
+            current_length += len(line) + 1
+        
+        return '\n'.join(result) + "\n[... truncated for brevity ...]"
+    
+    return text[:max_chars] + "\n[... truncated for brevity ...]"
+
+
 def strategist_synthesis_node(state: AnalysisState) -> dict:
     """Strategist synthesizes all agent outputs."""
     print("🔮 Strategist synthesizing insights...")
     llm = get_llm('strategist_synthesis')
     
+    # Truncate each agent output to reduce token usage
     synthesis_context = f"""
 Original Startup Idea: {state['startup_idea']}
 {f"Target Market: {state['target_market']}" if state.get('target_market') else ""}
 
-=== MARKET ANALYSIS ===
-{state['market_analysis']}
+=== MARKET ANALYSIS (Key Points) ===
+{truncate_with_context(state.get('market_analysis', ''), 2500)}
 
-=== COST PREDICTION ===
-{state['cost_prediction']}
+=== COST PREDICTION (Key Points) ===
+{truncate_with_context(state.get('cost_prediction', ''), 2000)}
 
-=== BUSINESS STRATEGY ===
-{state['business_strategy']}
+=== BUSINESS STRATEGY (Key Points) ===
+{truncate_with_context(state.get('business_strategy', ''), 2500)}
 
-=== MONETIZATION MODELS ===
-{state['monetization']}
+=== MONETIZATION MODELS (Key Points) ===
+{truncate_with_context(state.get('monetization', ''), 2000)}
 
-=== LEGAL CONSIDERATIONS ===
-{state['legal_considerations']}
+=== LEGAL CONSIDERATIONS (Key Points) ===
+{truncate_with_context(state.get('legal_considerations', ''), 2000)}
 
-=== TECHNOLOGY STACK ===
-{state['tech_stack']}
+=== TECHNOLOGY STACK (Key Points) ===
+{truncate_with_context(state.get('tech_stack', ''), 1500)}
 """
     
     response = llm.invoke([
@@ -1084,11 +1113,11 @@ def critic_review_node(state: AnalysisState) -> dict:
 Original Startup Idea: {state['startup_idea']}
 
 === STRATEGIST'S SYNTHESIZED PLAN ===
-{state['strategist_synthesis']}
+{truncate_with_context(state.get('strategist_synthesis', ''), 4000)}
 
-=== KEY DATA FROM ANALYSES ===
-Market Analysis Summary: {state['market_analysis'][:2000]}...
-Cost Estimates: {state['cost_prediction'][:2000]}...
+=== KEY SUPPORTING DATA ===
+Market Highlights: {truncate_with_context(state.get('market_analysis', ''), 1500)}
+Cost Overview: {truncate_with_context(state.get('cost_prediction', ''), 1500)}
 """
     
     response = llm.invoke([
@@ -1112,10 +1141,10 @@ Format your response clearly with headers and bullet points. Do not use asterisk
 
     refinement_context = f"""
 === YOUR ORIGINAL SYNTHESIZED PLAN ===
-{state['strategist_synthesis']}
+{truncate_with_context(state.get('strategist_synthesis', ''), 3500)}
 
 === CRITIC'S REVIEW ===
-{state['critic_review']}
+{truncate_with_context(state.get('critic_review', ''), 3000)}
 
 Based on this feedback, provide a refined final strategy that addresses the valid concerns while maintaining strategic coherence.
 """
