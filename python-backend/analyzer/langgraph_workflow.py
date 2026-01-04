@@ -855,6 +855,53 @@ class AnalysisState(TypedDict):
 # Agent Node Functions
 # =============================================================================
 
+# Valid agent names and common typo aliases
+ALLOWED_AGENTS = {
+    "MARKET_ANALYST", "COST_PREDICTOR", "BUSINESS_STRATEGIST",
+    "MONETIZATION_EXPERT", "LEGAL_ADVISOR", "TECH_ARCHITECT"
+}
+
+AGENT_ALIASES = {
+    # Common typos and variations
+    "MARKET_ANALYSIST": "MARKET_ANALYST",
+    "MARKET_ANALYSIS": "MARKET_ANALYST",
+    "MARKETANALYST": "MARKET_ANALYST",
+    "COST_PREDICTION": "COST_PREDICTOR",
+    "COSTPREDICTOR": "COST_PREDICTOR",
+    "BUSINESS_STRATEGY": "BUSINESS_STRATEGIST",
+    "BUSINESSSTRATEGIST": "BUSINESS_STRATEGIST",
+    "MONETIZATION": "MONETIZATION_EXPERT",
+    "MONETISATION_EXPERT": "MONETIZATION_EXPERT",
+    "LEGAL": "LEGAL_ADVISOR",
+    "LEGALADVISOR": "LEGAL_ADVISOR",
+    "TECH": "TECH_ARCHITECT",
+    "TECHARCHITECT": "TECH_ARCHITECT",
+    "TECHNOLOGY_ARCHITECT": "TECH_ARCHITECT",
+}
+
+# Core agents that should always run
+CORE_AGENTS = {"MARKET_ANALYST", "BUSINESS_STRATEGIST"}
+
+
+def normalize_agent_names(agents: list) -> list:
+    """Normalize agent names to fix typos and ensure core agents are included."""
+    normalized = set()
+    
+    for agent in agents:
+        name = agent.strip().upper().replace(" ", "_")
+        # Apply alias mapping if exists
+        if name in AGENT_ALIASES:
+            name = AGENT_ALIASES[name]
+        # Only include valid agents
+        if name in ALLOWED_AGENTS:
+            normalized.add(name)
+    
+    # Always include core agents
+    normalized.update(CORE_AGENTS)
+    
+    return list(normalized)
+
+
 def create_user_context(state: AnalysisState) -> str:
     """Create the user context from state."""
     context = f"Startup Idea: {state['startup_idea']}"
@@ -878,17 +925,20 @@ def orchestrator_node(state: AnalysisState) -> dict:
     import json
     try:
         result = json.loads(response.content)
-        selected = result.get("selected_agents", ["MARKET_ANALYST", "BUSINESS_STRATEGIST"])
+        raw_selected = result.get("selected_agents", ["MARKET_ANALYST", "BUSINESS_STRATEGIST"])
         reasoning = result.get("reasoning", "Default analysis")
         category = result.get("startup_category", "General")
         complexity = result.get("complexity_score", 5)
     except json.JSONDecodeError:
         # Fallback to all agents if parsing fails
-        selected = ["MARKET_ANALYST", "COST_PREDICTOR", "BUSINESS_STRATEGIST", 
-                   "MONETIZATION_EXPERT", "LEGAL_ADVISOR", "TECH_ARCHITECT"]
+        raw_selected = ["MARKET_ANALYST", "COST_PREDICTOR", "BUSINESS_STRATEGIST", 
+                       "MONETIZATION_EXPERT", "LEGAL_ADVISOR", "TECH_ARCHITECT"]
         reasoning = "Full analysis (parsing fallback)"
         category = "General"
         complexity = 5
+    
+    # Normalize agent names to fix typos and ensure core agents
+    selected = normalize_agent_names(raw_selected)
     
     print(f"📋 Selected agents: {selected}")
     return {
