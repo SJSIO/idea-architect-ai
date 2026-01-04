@@ -137,8 +137,8 @@ export async function analyzeStartup(
           },
           body: JSON.stringify(payload),
         },
-        // Give enough time for a cold start + analysis.
-        120000
+        // Give enough time for a cold start + analysis (3 min to handle 429 retries).
+        180000
       );
 
       if (!response.ok) {
