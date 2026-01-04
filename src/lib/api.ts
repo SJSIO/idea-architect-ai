@@ -20,23 +20,31 @@ export async function getProject(id: string): Promise<Project | null> {
     .from('projects')
     .select('*')
     .eq('id', id)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error fetching project:', error);
     throw error;
   }
 
-  return data as Project;
+  return data as Project | null;
 }
 
 export async function createProject(startupIdea: string, targetMarket?: string): Promise<Project> {
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    throw new Error('You must be logged in to create a project');
+  }
+
   const { data, error } = await supabase
     .from('projects')
     .insert({
       startup_idea: startupIdea,
       target_market: targetMarket || null,
       status: 'pending',
+      user_id: user.id,
     })
     .select()
     .single();

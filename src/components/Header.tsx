@@ -1,9 +1,15 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Rocket, LayoutDashboard, Plus } from 'lucide-react';
+import { Rocket, LayoutDashboard, Plus, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
 
 export function Header() {
   const location = useLocation();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl">
@@ -38,6 +44,17 @@ export function Header() {
               New Analysis
             </Link>
           </Button>
+          {user && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSignOut}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </Button>
+          )}
         </nav>
       </div>
     </header>
