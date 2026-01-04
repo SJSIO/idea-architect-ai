@@ -29,6 +29,7 @@ export type Database = {
           target_market: string | null
           tech_stack: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           business_strategy?: string | null
@@ -44,6 +45,7 @@ export type Database = {
           target_market?: string | null
           tech_stack?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           business_strategy?: string | null
@@ -59,6 +61,7 @@ export type Database = {
           target_market?: string | null
           tech_stack?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
