@@ -5,9 +5,7 @@ export interface Project {
   market_analysis: string | null;
   cost_prediction: string | null;
   business_strategy: string | null;
-  monetization: string | null;
   legal_considerations: string | null;
-  tech_stack: string | null;
   strategist_critique: string | null;
   status: 'pending' | 'analyzing' | 'completed' | 'failed';
   created_at: string;
@@ -18,9 +16,7 @@ export interface AnalysisResult {
   marketAnalysis: string;
   costPrediction: string;
   businessStrategy: string;
-  monetization: string;
   legalConsiderations: string;
-  techStack: string;
   strategistCritique: string;
 }
 
@@ -55,25 +51,11 @@ export const AGENT_CARDS: AgentCard[] = [
     color: 'from-blue-500/20 to-blue-600/10',
   },
   {
-    id: 'monetization',
-    title: 'Monetization Models',
-    icon: '💳',
-    description: 'Revenue models and pricing strategies',
-    color: 'from-purple-500/20 to-purple-600/10',
-  },
-  {
     id: 'legalConsiderations',
     title: 'Legal Considerations',
     icon: '⚖️',
     description: 'Compliance, IP protection, and legal structure',
     color: 'from-rose-500/20 to-rose-600/10',
-  },
-  {
-    id: 'techStack',
-    title: 'Tech Architecture',
-    icon: '💻',
-    description: 'Technology recommendations and MVP planning',
-    color: 'from-indigo-500/20 to-indigo-600/10',
   },
   {
     id: 'strategistCritique',
