@@ -102,5 +102,69 @@ def api_root(request):
             "analyze": "/analyze",
             "projects": "/projects",
             "health": "/health",
+            "knowledge": "/knowledge",
+            "knowledge_status": "/knowledge/status",
+            "knowledge_locations": "/knowledge/locations",
         }
     })
+
+
+# =============================================================================
+# Knowledge Base Management Endpoints
+# =============================================================================
+
+@api_view(['GET'])
+def knowledge_status(request):
+    """Get status of all knowledge bases."""
+    from .rag_system import get_knowledge_base_status
+    
+    try:
+        status = get_knowledge_base_status()
+        return Response({
+            "success": True,
+            "status": status
+        })
+    except Exception as e:
+        return Response({
+            "success": False,
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+def knowledge_locations(request):
+    """Get file upload locations for each agent's knowledge base."""
+    from .rag_system import get_upload_locations
+    
+    try:
+        locations = get_upload_locations()
+        return Response({
+            "success": True,
+            "locations": locations
+        })
+    except Exception as e:
+        return Response({
+            "success": False,
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def refresh_knowledge(request):
+    """Refresh/reload knowledge bases."""
+    from .rag_system import refresh_knowledge_base
+    
+    agent_type = request.data.get('agent_type')  # Optional: specific agent
+    
+    try:
+        results = refresh_knowledge_base(agent_type)
+        return Response({
+            "success": True,
+            "message": "Knowledge base refreshed successfully",
+            "results": results
+        })
+    except Exception as e:
+        return Response({
+            "success": False,
+            "error": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
