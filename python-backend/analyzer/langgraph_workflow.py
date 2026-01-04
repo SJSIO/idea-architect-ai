@@ -34,6 +34,10 @@ def get_llm(agent_name: str = 'default'):
         ChatGroq instance configured with the appropriate API key
     """
     from .api_key_manager import get_key_for_agent
+    import time
+    
+    # Add delay between agent calls to avoid rate limits
+    time.sleep(2)
     
     api_key = get_key_for_agent(agent_name)
     
@@ -451,106 +455,6 @@ REQUIRED SECTIONS:
 
 Be thorough and specific to Indian law. Include actionable recommendations and estimated costs in INR."""
 
-STRATEGIST_PROMPT = """You are the Chief Strategy Officer synthesizing insights from a world-class team of specialists into a unified, actionable strategic plan.
-
-Based on all the analyses provided, create a COMPREHENSIVE synthesized strategic plan that:
-
-1. EXECUTIVE SYNTHESIS
-   - Key insights from each specialist
-   - Critical success factors identified
-   - Primary risks and opportunities
-   - Strategic priorities ranking
-
-2. INTEGRATED STRATEGIC FRAMEWORK
-   - How market, financial, and technical strategies align
-   - Dependencies between different elements
-   - Synergies identified
-   - Conflicts resolved
-
-3. PRIORITIZED ACTION ROADMAP
-   - Immediate actions (Week 1-2)
-   - Short-term priorities (Month 1)
-   - Medium-term goals (Months 2-6)
-   - Long-term objectives (6-18 months)
-
-4. RESOURCE ALLOCATION
-   - Budget allocation across areas
-   - Team priorities
-   - Time investment recommendations
-
-5. SUCCESS METRICS DASHBOARD
-   - North Star metric
-   - Key Performance Indicators by area
-   - Milestones and checkpoints
-
-6. RISK MITIGATION MATRIX
-   - Top risks with probability and impact
-   - Mitigation strategies
-   - Contingency plans
-
-7. 90-DAY EXECUTION PLAYBOOK
-   - Week-by-week action items
-   - Decision points
-   - Review cadence
-
-Be specific, actionable, and ensure all elements work together cohesively."""
-
-CRITIC_PROMPT = """You are a seasoned Devil's Advocate and Critical Analyst with a track record of identifying blind spots that cause startups to fail.
-
-Your role is to RIGOROUSLY stress-test the strategic plan and identify ALL potential weaknesses.
-
-CRITICAL ANALYSIS FRAMEWORK:
-
-1. ASSUMPTION AUDIT
-   - List every major assumption in the plan
-   - Rate each assumption's validity (Strong/Moderate/Weak)
-   - Identify unverified or risky assumptions
-   - Recommend validation approaches
-
-2. RISK DEEP DIVE
-   - Market risks: What if the market doesn't respond as expected?
-   - Competitive risks: What moves could competitors make?
-   - Execution risks: What could go wrong operationally?
-   - Financial risks: Cash flow and funding concerns
-   - Technical risks: Technology implementation challenges
-   - Team risks: People and capability gaps
-   - Regulatory risks: Compliance and legal threats
-
-3. GAP ANALYSIS
-   - What's missing from the analysis?
-   - What scenarios weren't considered?
-   - What data would strengthen the plan?
-   - What expertise is lacking?
-
-4. MARKET REALITY CHECK
-   - Is the market sizing realistic?
-   - Are customer acquisition assumptions valid?
-   - Is the competitive analysis complete?
-   - Are the growth projections achievable?
-
-5. EXECUTION FEASIBILITY
-   - Is the timeline realistic?
-   - Are the resource requirements accurate?
-   - Can the team actually deliver this?
-   - What are the hardest parts to execute?
-
-6. ALTERNATIVE PERSPECTIVES
-   - What other approaches might work better?
-   - What would a skeptical investor say?
-   - What would a direct competitor think?
-   - What would a potential customer question?
-
-7. FAILURE MODE ANALYSIS
-   - Most likely ways this could fail
-   - Early warning signs to watch
-   - Circuit breakers and pivot triggers
-
-8. RECOMMENDATIONS FOR IMPROVEMENT
-   - Priority fixes (must address before launch)
-   - Important improvements (address within 90 days)
-   - Nice-to-haves (consider for future)
-
-Be constructively brutal. Your goal is to make this plan bulletproof by exposing every weakness NOW."""
 
 
 # =============================================================================
@@ -607,9 +511,6 @@ class AnalysisState(TypedDict):
     cost_prediction: str
     business_strategy: str
     legal_considerations: str
-    strategist_synthesis: str
-    critic_review: str
-    final_strategy: str
 
 
 # =============================================================================
@@ -768,85 +669,6 @@ def legal_advisor_node(state: AnalysisState) -> dict:
     return {"legal_considerations": response.content}
 
 
-def strategist_synthesis_node(state: AnalysisState) -> dict:
-    """Strategist synthesizes all agent outputs."""
-    print("🔮 Strategist synthesizing insights...")
-    llm = get_llm('strategist_synthesis')
-    
-    synthesis_context = f"""
-Original Startup Idea: {state['startup_idea']}
-{f"Target Market: {state['target_market']}" if state.get('target_market') else ""}
-
-=== MARKET ANALYSIS ===
-{state['market_analysis']}
-
-=== COST PREDICTION ===
-{state['cost_prediction']}
-
-=== BUSINESS STRATEGY ===
-{state['business_strategy']}
-
-=== LEGAL CONSIDERATIONS ===
-{state['legal_considerations']}
-"""
-    
-    response = llm.invoke([
-        SystemMessage(content=STRATEGIST_PROMPT),
-        HumanMessage(content=synthesis_context)
-    ])
-    return {"strategist_synthesis": response.content}
-
-
-def critic_review_node(state: AnalysisState) -> dict:
-    """Critic reviews and challenges the strategist's plan."""
-    print("🔍 Critic reviewing the plan...")
-    llm = get_llm('critic_review')
-    
-    critic_context = f"""
-Original Startup Idea: {state['startup_idea']}
-
-=== STRATEGIST'S SYNTHESIZED PLAN ===
-{state['strategist_synthesis']}
-
-=== KEY DATA FROM ANALYSES ===
-Market Analysis Summary: {state['market_analysis'][:2000]}...
-Cost Estimates: {state['cost_prediction'][:2000]}...
-"""
-    
-    response = llm.invoke([
-        SystemMessage(content=CRITIC_PROMPT),
-        HumanMessage(content=critic_context)
-    ])
-    return {"critic_review": response.content}
-
-
-def final_refinement_node(state: AnalysisState) -> dict:
-    """Strategist refines plan based on critic feedback."""
-    print("✨ Generating final refined strategy...")
-    llm = get_llm('final_refinement')
-    
-    refinement_prompt = """You are the Senior Business Strategist again.
-Review the Critic's feedback and refine your strategic plan.
-Address the valid concerns raised while maintaining the core strategy's strengths.
-Create a FINAL, battle-tested strategic plan that is comprehensive and actionable.
-
-Format your response clearly with headers and bullet points. Do not use asterisks for emphasis - use clear section headers instead."""
-
-    refinement_context = f"""
-=== YOUR ORIGINAL SYNTHESIZED PLAN ===
-{state['strategist_synthesis']}
-
-=== CRITIC'S REVIEW ===
-{state['critic_review']}
-
-Based on this feedback, provide a refined final strategy that addresses the valid concerns while maintaining strategic coherence.
-"""
-    
-    response = llm.invoke([
-        SystemMessage(content=refinement_prompt),
-        HumanMessage(content=refinement_context)
-    ])
-    return {"final_strategy": response.content}
 
 
 # =============================================================================
@@ -866,30 +688,18 @@ def build_analysis_graph() -> StateGraph:
     workflow.add_node("cost_predictor", cost_predictor_node)
     workflow.add_node("business_strategist", business_strategist_node)
     workflow.add_node("legal_advisor", legal_advisor_node)
-    workflow.add_node("strategist_synthesis", strategist_synthesis_node)
-    workflow.add_node("critic_review", critic_review_node)
-    workflow.add_node("final_refinement", final_refinement_node)
     
     # Set entry point to orchestrator
     workflow.set_entry_point("orchestrator")
     
-    # Orchestrator -> specialist agents (sequential for memory efficiency)
+    # Orchestrator -> specialist agents (sequential for rate limit management)
     workflow.add_edge("orchestrator", "market_analyst")
     workflow.add_edge("market_analyst", "cost_predictor")
     workflow.add_edge("cost_predictor", "business_strategist")
     workflow.add_edge("business_strategist", "legal_advisor")
     
-    # Phase 2: Strategist synthesizes all outputs
-    workflow.add_edge("legal_advisor", "strategist_synthesis")
-    
-    # Phase 3: Critic reviews the synthesis
-    workflow.add_edge("strategist_synthesis", "critic_review")
-    
-    # Phase 4: Final refinement based on criticism
-    workflow.add_edge("critic_review", "final_refinement")
-    
-    # End the workflow
-    workflow.add_edge("final_refinement", END)
+    # End after legal advisor
+    workflow.add_edge("legal_advisor", END)
     
     return workflow.compile()
 
@@ -918,9 +728,6 @@ def run_analysis(startup_idea: str, target_market: Optional[str] = None) -> dict
         "cost_prediction": "",
         "business_strategy": "",
         "legal_considerations": "",
-        "strategist_synthesis": "",
-        "critic_review": "",
-        "final_strategy": "",
     }
     
     final_state = graph.invoke(initial_state)
@@ -936,5 +743,4 @@ def run_analysis(startup_idea: str, target_market: Optional[str] = None) -> dict
         "costPrediction": final_state["cost_prediction"],
         "businessStrategy": final_state["business_strategy"],
         "legalConsiderations": final_state["legal_considerations"],
-        "strategistCritique": final_state["final_strategy"],
     }

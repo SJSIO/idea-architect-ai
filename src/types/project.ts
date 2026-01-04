@@ -6,7 +6,6 @@ export interface Project {
   cost_prediction: string | null;
   business_strategy: string | null;
   legal_considerations: string | null;
-  strategist_critique: string | null;
   status: 'pending' | 'analyzing' | 'completed' | 'failed';
   created_at: string;
   updated_at: string;
@@ -17,7 +16,6 @@ export interface AnalysisResult {
   costPrediction: string;
   businessStrategy: string;
   legalConsiderations: string;
-  strategistCritique: string;
 }
 
 export interface AgentCard {
@@ -56,12 +54,5 @@ export const AGENT_CARDS: AgentCard[] = [
     icon: '⚖️',
     description: 'Compliance, IP protection, and legal structure',
     color: 'from-rose-500/20 to-rose-600/10',
-  },
-  {
-    id: 'strategistCritique',
-    title: 'Strategic Synthesis',
-    icon: '🔮',
-    description: 'Refined strategy after Strategist vs Critic debate',
-    color: 'from-emerald-500/20 to-emerald-600/10',
   },
 ];

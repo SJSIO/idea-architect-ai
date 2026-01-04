@@ -6,15 +6,10 @@ import { Badge } from '@/components/ui/badge';
 
 const ANALYSIS_STEPS = [
   { id: 0, label: 'Orchestrator', icon: '🎭', duration: 5, description: 'Evaluating idea & selecting agents' },
-  { id: 1, label: 'Market Analyst', icon: '📈', duration: 8, description: 'Analyzing market opportunity' },
-  { id: 2, label: 'Cost Predictor', icon: '💰', duration: 8, description: 'Estimating costs & funding' },
-  { id: 3, label: 'Business Strategist', icon: '🎯', duration: 8, description: 'Building go-to-market strategy' },
-  { id: 4, label: 'Monetization Expert', icon: '💳', duration: 8, description: 'Designing revenue models' },
-  { id: 5, label: 'Legal Advisor', icon: '⚖️', duration: 8, description: 'Reviewing compliance & IP' },
-  { id: 6, label: 'Tech Architect', icon: '💻', duration: 8, description: 'Recommending tech stack' },
-  { id: 7, label: 'Strategic Synthesis', icon: '🔮', duration: 15, description: 'Synthesizing all insights' },
-  { id: 8, label: 'Critic Review', icon: '🔍', duration: 10, description: 'Stress-testing the plan' },
-  { id: 9, label: 'Final Refinement', icon: '✨', duration: 10, description: 'Creating final strategy' },
+  { id: 1, label: 'Market Analyst', icon: '📈', duration: 10, description: 'Analyzing market opportunity' },
+  { id: 2, label: 'Cost Predictor', icon: '💰', duration: 10, description: 'Estimating costs & funding' },
+  { id: 3, label: 'Business Strategist', icon: '🎯', duration: 10, description: 'Building go-to-market strategy' },
+  { id: 4, label: 'Legal Advisor', icon: '⚖️', duration: 10, description: 'Reviewing compliance & IP' },
 ];
 
 interface AnalysisProgressProps {
@@ -146,7 +141,7 @@ export function AnalysisProgress({ isAnalyzing, orchestratorData }: AnalysisProg
           </div>
         </div>
 
-        <div className="grid grid-cols-5 gap-2">
+        <div className="grid grid-cols-5 gap-2 sm:grid-cols-5">
           {ANALYSIS_STEPS.map((step, index) => (
             <div
               key={step.id}

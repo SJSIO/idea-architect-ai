@@ -110,7 +110,6 @@ export default function ProjectDetail() {
     costPrediction: project.cost_prediction,
     businessStrategy: project.business_strategy,
     legalConsiderations: project.legal_considerations,
-    strategistCritique: project.strategist_critique,
   };
 
   return (

@@ -69,7 +69,6 @@ export async function updateProjectAnalysis(id: string, analysis: AnalysisResult
       cost_prediction: analysis.costPrediction,
       business_strategy: analysis.businessStrategy,
       legal_considerations: analysis.legalConsiderations,
-      strategist_critique: analysis.strategistCritique,
       status: 'completed',
     })
     .eq('id', id);

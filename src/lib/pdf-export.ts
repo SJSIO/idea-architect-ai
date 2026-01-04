@@ -458,7 +458,6 @@ export function exportToPDF(project: Project): void {
     costPrediction: project.cost_prediction,
     businessStrategy: project.business_strategy,
     legalConsiderations: project.legal_considerations,
-    strategistCritique: project.strategist_critique,
   };
 
   for (const agent of AGENT_CARDS) {
