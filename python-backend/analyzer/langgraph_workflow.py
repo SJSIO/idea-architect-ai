@@ -117,7 +117,7 @@ REQUIRED SECTIONS:
 
 1. INITIAL SETUP COSTS (One-Time Investments - INDIA)
    
-   A. Legal & Incorporation (₹X - ₹X range)
+   A. Legal & Incorporation (Rs. X - Rs. X range)
       - Company registration (Private Limited via MCA)
       - GST registration
       - Professional tax registration
@@ -126,20 +126,20 @@ REQUIRED SECTIONS:
       - Trademark registration (India)
       - Compliance certifications
    
-   B. Technology Infrastructure (₹X - ₹X range)
+   B. Technology Infrastructure (Rs. X - Rs. X range)
       - Development environment setup
       - Cloud infrastructure (AWS Mumbai/GCP India region)
       - Software licenses and tools
       - Security implementations
       - Domain and SSL certificates
    
-   C. Office & Equipment (₹X - ₹X range)
+   C. Office & Equipment (Rs. X - Rs. X range)
       - Workspace options: Remote vs WeWork vs traditional office (by city tier)
       - Computer hardware
       - Office furniture and supplies
       - Communication systems
    
-   D. Branding & Marketing Launch (₹X - ₹X range)
+   D. Branding & Marketing Launch (Rs. X - Rs. X range)
       - Logo and brand identity design
       - Website development
       - Initial marketing collateral
@@ -147,14 +147,14 @@ REQUIRED SECTIONS:
 
 2. MONTHLY OPERATING COSTS (Recurring - INDIA)
    
-   A. Technology & Infrastructure (₹X - ₹X/month)
+   A. Technology & Infrastructure (Rs. X - Rs. X/month)
       - Cloud hosting (AWS India/GCP pricing)
       - SaaS subscriptions (list specific tools with Indian pricing)
       - API costs and third-party services
       - Development tools and licenses
       - Monitoring and security services
    
-   B. Team & Personnel (₹X - ₹X/month)
+   B. Team & Personnel (Rs. X - Rs. X/month)
       - Full-time employees (by role with Indian salary ranges by city tier)
         * Bangalore/Mumbai vs Hyderabad/Pune vs Tier 2 cities
       - Contractors and freelancers (Indian rates)
@@ -162,14 +162,14 @@ REQUIRED SECTIONS:
       - Training and development
       - Recruitment costs
    
-   C. Marketing & Customer Acquisition (₹X - ₹X/month)
+   C. Marketing & Customer Acquisition (Rs. X - Rs. X/month)
       - Digital advertising (by channel - Google, Meta, LinkedIn India CPCs)
       - Content marketing
       - SEO and organic growth
       - PR and influencer marketing (Indian rates)
       - Customer acquisition cost (CAC) estimate for India
 
-   D. Operations & Overhead (₹X - ₹X/month)
+   D. Operations & Overhead (Rs. X - Rs. X/month)
       - Office rent (by city: Mumbai, Bangalore, Delhi, Hyderabad, Pune)
       - Utilities
       - Insurance
@@ -204,7 +204,7 @@ REQUIRED SECTIONS:
    - Outsourcing opportunities
    - Phased spending approach
 
-Provide THREE scenarios: Bootstrap (minimal), Standard, and Well-Funded. Include specific numbers in INR (₹) for all estimates with USD equivalents for major totals.
+Provide THREE scenarios: Bootstrap (minimal), Standard, and Well-Funded. Include specific numbers in INR (Rs.) for all estimates with USD equivalents for major totals.
 
 BUSINESS_STRATEGIST_PROMPT = """You are a legendary Business Strategist who has launched and scaled multiple billion-dollar companies. You've advised Fortune 500 CEOs and successful startup founders.
 
