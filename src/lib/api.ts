@@ -68,9 +68,7 @@ export async function updateProjectAnalysis(id: string, analysis: AnalysisResult
       market_analysis: analysis.marketAnalysis,
       cost_prediction: analysis.costPrediction,
       business_strategy: analysis.businessStrategy,
-      monetization: analysis.monetization,
       legal_considerations: analysis.legalConsiderations,
-      tech_stack: analysis.techStack,
       strategist_critique: analysis.strategistCritique,
       status: 'completed',
     })

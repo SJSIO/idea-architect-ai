@@ -292,79 +292,6 @@ REQUIRED SECTIONS:
 
 Be specific, actionable, and bold. Include frameworks, metrics, and concrete action items throughout."""
 
-MONETIZATION_PROMPT = """You are a Monetization Strategy Expert who has designed pricing models for companies from startups to Fortune 500. You understand psychology, value-based pricing, and sustainable revenue models.
-
-Develop FOUR comprehensive monetization strategies for this startup idea. Each should be detailed enough to implement immediately.
-
-FOR EACH MONETIZATION MODEL, PROVIDE:
-
-MODEL 1: [Primary Recommendation]
-   
-   A. Model Overview
-      - Model name and type
-      - Core mechanics explanation
-      - Why this fits the product
-      - Target customer segment
-   
-   B. Pricing Architecture
-      - Tier 1: Free/Freemium (features, limits, purpose)
-      - Tier 2: Basic/Starter (price, features, target user)
-      - Tier 3: Professional/Growth (price, features, target user)
-      - Tier 4: Enterprise (custom pricing, features, target user)
-      - Add-ons and upsells
-   
-   C. Revenue Projections
-      - Year 1: Monthly and annual projections
-      - Year 2: Growth assumptions and projections
-      - Year 3: Scale assumptions and projections
-      - Conversion rate assumptions
-      - Churn rate assumptions
-      - Average Revenue Per User (ARPU)
-   
-   D. Implementation Details
-      - Technical requirements
-      - Billing system needs
-      - Contract terms
-      - Payment methods
-   
-   E. Pros & Cons Analysis
-      - Advantages (5+)
-      - Disadvantages and risks (5+)
-      - Mitigation strategies
-
-MODEL 2: [Alternative Approach]
-   [Same detailed structure as above]
-
-MODEL 3: [Experimental/Innovative Model]
-   [Same detailed structure as above]
-
-MODEL 4: [Hybrid Model]
-   [Combine elements of above models]
-   [Same detailed structure]
-
-ADDITIONAL SECTIONS:
-
-PRICING PSYCHOLOGY RECOMMENDATIONS
-- Anchoring strategies
-- Decoy pricing opportunities
-- Value framing techniques
-- Social proof integration
-
-MONETIZATION ROADMAP
-- Phase 1: Launch pricing
-- Phase 2: Price optimization
-- Phase 3: Enterprise pricing
-- Phase 4: International pricing
-
-METRICS TO TRACK
-- Monthly Recurring Revenue (MRR)
-- Annual Recurring Revenue (ARR)
-- Customer Lifetime Value (LTV)
-- Customer Acquisition Cost (CAC)
-- Net Revenue Retention
-- Expansion Revenue
-
-Include specific dollar amounts, percentages, and realistic projections based on industry benchmarks."""
 
 LEGAL_ADVISOR_PROMPT = """You are a Senior Legal Counsel specializing in INDIAN startup law, corporate governance, intellectual property, and regulatory compliance. You've advised hundreds of Indian startups from incorporation to IPO/acquisition.
 
@@ -524,166 +451,6 @@ REQUIRED SECTIONS:
 
 Be thorough and specific to Indian law. Include actionable recommendations and estimated costs in INR."""
 
-TECH_ARCHITECT_PROMPT = """You are a Principal Technology Architect with 25+ years of experience building scalable systems for startups and enterprises. You have architected systems handling millions of users and billions of transactions.
-
-Design an EXTREMELY COMPREHENSIVE technology architecture for this startup idea.
-
-REQUIRED SECTIONS:
-
-1. ARCHITECTURE OVERVIEW
-   - High-level system architecture description
-   - Architectural patterns chosen (microservices, monolith, serverless, etc.)
-   - Scalability considerations
-   - Key architectural decisions and rationale
-
-2. FRONTEND ARCHITECTURE
-   
-   A. Framework Selection
-      - Recommended framework: [e.g., React, Next.js, Vue.js]
-      - Justification and alternatives considered
-      - Version and key dependencies
-   
-   B. UI Component Strategy
-      - Component library choice
-      - Design system approach
-      - Styling solution (Tailwind, CSS-in-JS, etc.)
-   
-   C. State Management
-      - Solution choice and justification
-      - Data flow patterns
-      - Caching strategy
-   
-   D. Performance Optimization
-      - Code splitting approach
-      - Lazy loading strategy
-      - Image optimization
-      - Core Web Vitals targets
-
-3. BACKEND ARCHITECTURE
-   
-   A. Language & Framework
-      - Primary language: [e.g., Node.js, Python, Go]
-      - Framework: [e.g., Express, FastAPI, Gin]
-      - Justification and alternatives
-   
-   B. API Design
-      - API style (REST, GraphQL, gRPC)
-      - Versioning strategy
-      - Rate limiting approach
-      - Documentation (OpenAPI/Swagger)
-   
-   C. Authentication & Authorization
-      - Auth solution (Auth0, Firebase, custom)
-      - Token strategy (JWT, sessions)
-      - RBAC implementation
-      - OAuth2/OIDC integration
-
-4. DATABASE ARCHITECTURE
-   
-   A. Primary Database
-      - Technology choice (PostgreSQL, MongoDB, etc.)
-      - Data modeling approach
-      - Schema design principles
-      - Indexing strategy
-   
-   B. Caching Layer
-      - Caching solution (Redis, Memcached)
-      - Cache invalidation strategy
-      - Cache-aside vs write-through
-   
-   C. Search (if applicable)
-      - Search engine choice
-      - Indexing approach
-   
-   D. Data Scaling
-      - Sharding strategy
-      - Read replicas
-      - Connection pooling
-
-5. CLOUD INFRASTRUCTURE
-   
-   A. Cloud Provider Recommendation
-      - Primary provider and justification
-      - Multi-cloud considerations
-      - Cost optimization strategies
-   
-   B. Core Services
-      - Compute (containers, serverless, VMs)
-      - Storage solutions
-      - CDN configuration
-      - DNS and domain management
-   
-   C. Infrastructure as Code
-      - IaC tool choice (Terraform, Pulumi, CloudFormation)
-      - Environment management
-      - Secrets management
-
-6. DEVOPS & CI/CD
-   
-   A. Development Workflow
-      - Git branching strategy
-      - Code review process
-      - Testing requirements
-   
-   B. CI/CD Pipeline
-      - Pipeline stages
-      - Testing automation
-      - Deployment strategies (blue-green, canary)
-   
-   C. Monitoring & Observability
-      - Logging solution
-      - Metrics collection
-      - Alerting strategy
-      - APM tools
-
-7. SECURITY ARCHITECTURE
-   
-   - Security principles applied
-   - OWASP considerations
-   - Encryption (at rest, in transit)
-   - Security scanning and auditing
-   - Incident response preparation
-
-8. THIRD-PARTY INTEGRATIONS
-   
-   - Payment processing recommendation
-   - Email service provider
-   - SMS/Notification services
-   - Analytics and tracking
-   - Error monitoring
-   - Feature flags
-
-9. MVP DEVELOPMENT PLAN
-   
-   Phase 1: Foundation (Weeks 1-4)
-   - [Specific deliverables]
-   
-   Phase 2: Core Features (Weeks 5-8)
-   - [Specific deliverables]
-   
-   Phase 3: Launch Ready (Weeks 9-12)
-   - [Specific deliverables]
-
-10. TEAM COMPOSITION
-    
-    MVP Team:
-    - Roles needed with responsibilities
-    - Skill requirements
-    - Hiring vs outsourcing recommendations
-    
-    Scale Team:
-    - Additional roles for growth phase
-    - Organizational structure
-
-11. TECHNOLOGY BUDGET ESTIMATE
-    
-    - Monthly infrastructure costs (by tier)
-    - Development tool costs
-    - Third-party service costs
-    - Scaling cost projections
-
-Include architecture diagrams descriptions, specific technology versions, and cost estimates throughout."""
-
 STRATEGIST_PROMPT = """You are the Chief Strategy Officer synthesizing insights from a world-class team of specialists into a unified, actionable strategic plan.
 
 Based on all the analyses provided, create a COMPREHENSIVE synthesized strategic plan that:
@@ -798,16 +565,12 @@ AVAILABLE AGENTS:
 1. MARKET_ANALYST - For ideas needing market research, competitor analysis, TAM/SAM/SOM
 2. COST_PREDICTOR - For ideas requiring financial planning, cost breakdown, funding estimates
 3. BUSINESS_STRATEGIST - For ideas needing go-to-market strategy, business model design
-4. MONETIZATION_EXPERT - For ideas requiring revenue models, pricing strategies
-5. LEGAL_ADVISOR - For ideas with regulatory concerns, IP needs, compliance requirements
-6. TECH_ARCHITECT - For tech-focused ideas needing architecture, stack recommendations
+4. LEGAL_ADVISOR - For ideas with regulatory concerns, IP needs, compliance requirements
 
 RULES:
 - Always include MARKET_ANALYST and BUSINESS_STRATEGIST (core agents)
 - Include COST_PREDICTOR for capital-intensive ideas
 - Include LEGAL_ADVISOR for regulated industries (healthcare, finance, food, etc.)
-- Include TECH_ARCHITECT for software/tech products
-- Include MONETIZATION_EXPERT for B2C or SaaS ideas
 - Skip agents that are clearly not relevant to save time and resources
 
 Respond with a JSON object containing:
@@ -818,8 +581,8 @@ Respond with a JSON object containing:
 
 Example response:
 {
-  "selected_agents": ["MARKET_ANALYST", "BUSINESS_STRATEGIST", "TECH_ARCHITECT", "MONETIZATION_EXPERT"],
-  "reasoning": "Tech SaaS product requires market analysis, business strategy, technical architecture, and monetization planning. Legal and cost analysis less critical at ideation stage.",
+  "selected_agents": ["MARKET_ANALYST", "BUSINESS_STRATEGIST", "COST_PREDICTOR", "LEGAL_ADVISOR"],
+  "reasoning": "This idea requires market analysis, business strategy, cost planning, and legal compliance. All core agents are relevant.",
   "startup_category": "SaaS",
   "complexity_score": 7
 }
@@ -843,9 +606,7 @@ class AnalysisState(TypedDict):
     market_analysis: str
     cost_prediction: str
     business_strategy: str
-    monetization: str
     legal_considerations: str
-    tech_stack: str
     strategist_synthesis: str
     critic_review: str
     final_strategy: str
@@ -884,8 +645,7 @@ def orchestrator_node(state: AnalysisState) -> dict:
         complexity = result.get("complexity_score", 5)
     except json.JSONDecodeError:
         # Fallback to all agents if parsing fails
-        selected = ["MARKET_ANALYST", "COST_PREDICTOR", "BUSINESS_STRATEGIST", 
-                   "MONETIZATION_EXPERT", "LEGAL_ADVISOR", "TECH_ARCHITECT"]
+        selected = ["MARKET_ANALYST", "COST_PREDICTOR", "BUSINESS_STRATEGIST", "LEGAL_ADVISOR"]
         reasoning = "Full analysis (parsing fallback)"
         category = "General"
         complexity = 5
@@ -977,22 +737,6 @@ def business_strategist_node(state: AnalysisState) -> dict:
     return {"business_strategy": response.content}
 
 
-def monetization_node(state: AnalysisState) -> dict:
-    """Monetization Expert agent."""
-    if "MONETIZATION_EXPERT" not in state.get("selected_agents", []):
-        print("⏭️ Skipping Monetization Expert (not selected)")
-        return {"monetization": ""}
-    
-    print("💳 Monetization Expert working...")
-    llm = get_llm('monetization')
-    context = create_user_context(state)
-    response = llm.invoke([
-        SystemMessage(content=MONETIZATION_PROMPT),
-        HumanMessage(content=context)
-    ])
-    return {"monetization": response.content}
-
-
 def legal_advisor_node(state: AnalysisState) -> dict:
     """Legal Advisor agent with RAG-enhanced Indian legal knowledge."""
     if "LEGAL_ADVISOR" not in state.get("selected_agents", []):
@@ -1024,22 +768,6 @@ def legal_advisor_node(state: AnalysisState) -> dict:
     return {"legal_considerations": response.content}
 
 
-def tech_architect_node(state: AnalysisState) -> dict:
-    """Tech Architect agent."""
-    if "TECH_ARCHITECT" not in state.get("selected_agents", []):
-        print("⏭️ Skipping Tech Architect (not selected)")
-        return {"tech_stack": ""}
-    
-    print("💻 Tech Architect working...")
-    llm = get_llm('tech_architect')
-    context = create_user_context(state)
-    response = llm.invoke([
-        SystemMessage(content=TECH_ARCHITECT_PROMPT),
-        HumanMessage(content=context)
-    ])
-    return {"tech_stack": response.content}
-
-
 def strategist_synthesis_node(state: AnalysisState) -> dict:
     """Strategist synthesizes all agent outputs."""
     print("🔮 Strategist synthesizing insights...")
@@ -1058,14 +786,8 @@ Original Startup Idea: {state['startup_idea']}
 === BUSINESS STRATEGY ===
 {state['business_strategy']}
 
-=== MONETIZATION MODELS ===
-{state['monetization']}
-
 === LEGAL CONSIDERATIONS ===
 {state['legal_considerations']}
-
-=== TECHNOLOGY STACK ===
-{state['tech_stack']}
 """
     
     response = llm.invoke([
@@ -1143,9 +865,7 @@ def build_analysis_graph() -> StateGraph:
     workflow.add_node("market_analyst", market_analyst_node)
     workflow.add_node("cost_predictor", cost_predictor_node)
     workflow.add_node("business_strategist", business_strategist_node)
-    workflow.add_node("monetization", monetization_node)
     workflow.add_node("legal_advisor", legal_advisor_node)
-    workflow.add_node("tech_architect", tech_architect_node)
     workflow.add_node("strategist_synthesis", strategist_synthesis_node)
     workflow.add_node("critic_review", critic_review_node)
     workflow.add_node("final_refinement", final_refinement_node)
@@ -1157,12 +877,10 @@ def build_analysis_graph() -> StateGraph:
     workflow.add_edge("orchestrator", "market_analyst")
     workflow.add_edge("market_analyst", "cost_predictor")
     workflow.add_edge("cost_predictor", "business_strategist")
-    workflow.add_edge("business_strategist", "monetization")
-    workflow.add_edge("monetization", "legal_advisor")
-    workflow.add_edge("legal_advisor", "tech_architect")
+    workflow.add_edge("business_strategist", "legal_advisor")
     
     # Phase 2: Strategist synthesizes all outputs
-    workflow.add_edge("tech_architect", "strategist_synthesis")
+    workflow.add_edge("legal_advisor", "strategist_synthesis")
     
     # Phase 3: Critic reviews the synthesis
     workflow.add_edge("strategist_synthesis", "critic_review")
@@ -1199,9 +917,7 @@ def run_analysis(startup_idea: str, target_market: Optional[str] = None) -> dict
         "market_analysis": "",
         "cost_prediction": "",
         "business_strategy": "",
-        "monetization": "",
         "legal_considerations": "",
-        "tech_stack": "",
         "strategist_synthesis": "",
         "critic_review": "",
         "final_strategy": "",
@@ -1216,11 +932,9 @@ def run_analysis(startup_idea: str, target_market: Optional[str] = None) -> dict
         "startup_category": final_state["startup_category"],
         "complexity_score": final_state["complexity_score"],
         # Analysis results
-        "market_analysis": final_state["market_analysis"],
-        "cost_prediction": final_state["cost_prediction"],
-        "business_strategy": final_state["business_strategy"],
-        "monetization": final_state["monetization"],
-        "legal_considerations": final_state["legal_considerations"],
-        "tech_stack": final_state["tech_stack"],
-        "strategist_critique": final_state["final_strategy"],
+        "marketAnalysis": final_state["market_analysis"],
+        "costPrediction": final_state["cost_prediction"],
+        "businessStrategy": final_state["business_strategy"],
+        "legalConsiderations": final_state["legal_considerations"],
+        "strategistCritique": final_state["final_strategy"],
     }
