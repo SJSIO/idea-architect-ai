@@ -106,16 +106,30 @@ Format your response with clear headers and use numbered lists, bullet points, a
 
 COST_PREDICTOR_PROMPT = """You are an expert Financial Analyst and Cost Prediction Specialist with extensive experience in Indian startup funding and financial planning.
 
-RETRIEVED INDIAN COST BENCHMARKS:
+RETRIEVED INDIAN COST BENCHMARKS FROM KNOWLEDGE BASE:
 {cost_context}
 
-Use the above Indian cost data (if available) to provide accurate, India-specific cost projections. All amounts should be in INR (with USD equivalents where relevant).
+IMPORTANT: The above data contains REAL Indian cost benchmarks with the following structure:
+- Category & Subcategory: Type of cost (e.g., Technology Infrastructure, Team & Personnel)
+- Provider: Specific vendor/service provider
+- Item_Name: Specific item or service
+- Price_per_Unit_INR: Cost per unit in Indian Rupees
+- Base_Monthly_Cost_INR: Monthly recurring cost
+- startup_stage: Which stage this cost applies to (pre-seed, seed, growth, etc.)
+- cost_type: One-time or recurring
+- business_function: Which business area uses this
+- Context_Assumption: Usage assumptions for the pricing
+- risk_factor: Cost volatility indicator
+- Cost_Saving_Tip: Optimization recommendations
+
+YOU MUST USE THE ACTUAL DATA FROM THE KNOWLEDGE BASE ABOVE to provide specific, accurate cost estimates. Reference actual providers, prices, and items from the retrieved data.
 
 Provide an EXTREMELY DETAILED and comprehensive cost breakdown for this startup idea in the INDIAN context. Include specific amounts in INR for all estimates.
 
 REQUIRED SECTIONS:
 
 1. INITIAL SETUP COSTS (One-Time Investments - INDIA)
+   Reference actual items from the knowledge base where cost_type = "one-time"
    
    A. Legal & Incorporation (Rs. X - Rs. X range)
       - Company registration (Private Limited via MCA)
@@ -146,31 +160,32 @@ REQUIRED SECTIONS:
       - Launch campaign budget
 
 2. MONTHLY OPERATING COSTS (Recurring - INDIA)
+   Reference actual items from the knowledge base where cost_type = "recurring" or "monthly"
    
    A. Technology & Infrastructure (Rs. X - Rs. X/month)
-      - Cloud hosting (AWS India/GCP pricing)
-      - SaaS subscriptions (list specific tools with Indian pricing)
+      - Cloud hosting (reference specific providers from knowledge base)
+      - SaaS subscriptions (list specific tools with actual pricing from data)
       - API costs and third-party services
       - Development tools and licenses
       - Monitoring and security services
    
    B. Team & Personnel (Rs. X - Rs. X/month)
-      - Full-time employees (by role with Indian salary ranges by city tier)
+      - Full-time employees (use salary data from knowledge base by role)
         * Bangalore/Mumbai vs Hyderabad/Pune vs Tier 2 cities
-      - Contractors and freelancers (Indian rates)
+      - Contractors and freelancers (Indian rates from data)
       - Employee benefits: PF, ESI, gratuity
       - Training and development
       - Recruitment costs
    
    C. Marketing & Customer Acquisition (Rs. X - Rs. X/month)
-      - Digital advertising (by channel - Google, Meta, LinkedIn India CPCs)
+      - Digital advertising (use CPCs from knowledge base)
       - Content marketing
       - SEO and organic growth
       - PR and influencer marketing (Indian rates)
       - Customer acquisition cost (CAC) estimate for India
 
    D. Operations & Overhead (Rs. X - Rs. X/month)
-      - Office rent (by city: Mumbai, Bangalore, Delhi, Hyderabad, Pune)
+      - Office rent (reference city-wise rates from knowledge base)
       - Utilities
       - Insurance
       - Accounting and bookkeeping (CA fees)
@@ -178,6 +193,7 @@ REQUIRED SECTIONS:
       - Miscellaneous operations
 
 3. FINANCIAL PROJECTIONS (Years 1-3 - INDIA)
+   Use startup_stage data to differentiate costs across growth phases
    
    - Monthly burn rate scenarios (conservative, moderate, aggressive) in INR
    - Revenue projections by quarter in INR
@@ -196,6 +212,7 @@ REQUIRED SECTIONS:
    - Key milestones for each funding stage
 
 5. COST OPTIMIZATION STRATEGIES (INDIA-SPECIFIC)
+   Include Cost_Saving_Tip values from the knowledge base
    
    - Leverage Startup India tax benefits
    - Government grants and schemes
@@ -203,8 +220,12 @@ REQUIRED SECTIONS:
    - Build vs buy recommendations for India
    - Outsourcing opportunities
    - Phased spending approach
+   - SPECIFIC TIPS FROM DATA: Include any Cost_Saving_Tip values retrieved
 
-Provide THREE scenarios: Bootstrap (minimal), Standard, and Well-Funded. Include specific numbers in INR (Rs.) for all estimates with USD equivalents for major totals.
+6. RISK FACTORS
+   Reference risk_factor values from the knowledge base for each cost category
+
+Provide THREE scenarios: Bootstrap (minimal), Standard, and Well-Funded. Include specific numbers in INR (Rs.) for all estimates with USD equivalents for major totals. CITE SPECIFIC ITEMS FROM THE KNOWLEDGE BASE DATA.
 
 BUSINESS_STRATEGIST_PROMPT = """You are a legendary Business Strategist who has launched and scaled multiple billion-dollar companies. You've advised Fortune 500 CEOs and successful startup founders.
 
@@ -988,13 +1009,40 @@ def cost_predictor_node(state: AnalysisState) -> dict:
     
     print("💰 Cost Predictor working...")
     
-    # Query RAG for Indian cost benchmarks
+    # Query RAG for Indian cost benchmarks with multiple relevant queries
     cost_context = "No additional cost data available."
     try:
         from .rag_system import query_cost_knowledge
-        query = f"{state['startup_idea']} startup costs India salaries infrastructure"
-        cost_context = query_cost_knowledge(query, k=5)
-        print("💵 Retrieved Indian cost benchmarks from knowledge base")
+        
+        startup_idea = state['startup_idea']
+        target_market = state.get('target_market', 'India')
+        
+        # Build comprehensive queries to retrieve relevant cost data
+        queries = [
+            f"{startup_idea} technology infrastructure cloud hosting SaaS costs",
+            f"{startup_idea} team salaries personnel hiring costs India",
+            f"{startup_idea} marketing customer acquisition costs India",
+            f"startup setup costs legal incorporation office equipment India",
+            f"{startup_idea} {target_market} operational overhead monthly expenses"
+        ]
+        
+        # Retrieve from multiple query angles and combine
+        all_contexts = []
+        for query in queries:
+            try:
+                result = query_cost_knowledge(query, k=3)
+                if result and "No relevant information" not in result and "Error" not in result:
+                    all_contexts.append(result)
+            except Exception as query_error:
+                print(f"⚠️ Query failed for '{query[:50]}...': {query_error}")
+                continue
+        
+        if all_contexts:
+            cost_context = "\n\n--- ADDITIONAL COST DATA ---\n\n".join(all_contexts)
+            print(f"💵 Retrieved Indian cost benchmarks from {len(all_contexts)} queries")
+        else:
+            print("⚠️ No cost data retrieved from knowledge base")
+            
     except Exception as e:
         print(f"⚠️ RAG query failed (continuing without context): {e}")
     
