@@ -1,78 +1,81 @@
-import { supabase } from '@/integrations/supabase/client';
 import type { Project, AnalysisResult } from '@/types/project';
 
-export async function getProjects(): Promise<Project[]> {
-  const { data, error } = await supabase
-    .from('projects')
-    .select('*')
-    .order('created_at', { ascending: false });
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-  if (error) {
-    console.error('Error fetching projects:', error);
-    throw error;
+function getAuthHeaders(): HeadersInit {
+  const token = localStorage.getItem('access_token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
+
+export async function getProjects(): Promise<Project[]> {
+  const response = await fetch(`${API_URL}/projects`, {
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || 'Failed to fetch projects');
   }
 
-  return data as Project[];
+  return response.json();
 }
 
 export async function getProject(id: string): Promise<Project | null> {
-  const { data, error } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle();
+  const response = await fetch(`${API_URL}/projects/${id}`, {
+    headers: getAuthHeaders(),
+  });
 
-  if (error) {
-    console.error('Error fetching project:', error);
-    throw error;
+  if (response.status === 404) {
+    return null;
   }
 
-  return data as Project | null;
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || 'Failed to fetch project');
+  }
+
+  return response.json();
 }
 
 export async function createProject(startupIdea: string, targetMarket?: string): Promise<Project> {
-  // Get current user
-  const { data: { user } } = await supabase.auth.getUser();
-  
-  if (!user) {
-    throw new Error('You must be logged in to create a project');
-  }
-
-  const { data, error } = await supabase
-    .from('projects')
-    .insert({
+  const response = await fetch(`${API_URL}/projects`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({
       startup_idea: startupIdea,
       target_market: targetMarket || null,
-      status: 'pending',
-      user_id: user.id,
-    })
-    .select()
-    .single();
+    }),
+  });
 
-  if (error) {
-    console.error('Error creating project:', error);
-    throw error;
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || 'Failed to create project');
   }
 
-  return data as Project;
+  return response.json();
 }
 
 export async function updateProjectStatus(id: string, status: Project['status']): Promise<void> {
-  const { error } = await supabase
-    .from('projects')
-    .update({ status })
-    .eq('id', id);
+  const response = await fetch(`${API_URL}/projects/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ status }),
+  });
 
-  if (error) {
-    console.error('Error updating project status:', error);
-    throw error;
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || 'Failed to update project status');
   }
 }
 
 export async function updateProjectAnalysis(id: string, analysis: AnalysisResult): Promise<void> {
-  const { error } = await supabase
-    .from('projects')
-    .update({
+  const response = await fetch(`${API_URL}/projects/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({
       market_analysis: analysis.marketAnalysis,
       cost_prediction: analysis.costPrediction,
       business_strategy: analysis.businessStrategy,
@@ -81,25 +84,32 @@ export async function updateProjectAnalysis(id: string, analysis: AnalysisResult
       tech_stack: analysis.techStack,
       strategist_critique: analysis.strategistCritique,
       status: 'completed',
-    })
-    .eq('id', id);
+    }),
+  });
 
-  if (error) {
-    console.error('Error updating project analysis:', error);
-    throw error;
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || 'Failed to update project analysis');
   }
 }
 
-const DJANGO_API_URL = 'https://idea-architect-ai-1.onrender.com';
+export async function deleteProject(id: string): Promise<void> {
+  const response = await fetch(`${API_URL}/projects/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || 'Failed to delete project');
+  }
+}
 
 export async function analyzeStartup(
   startupIdea: string,
   targetMarket: string | undefined,
   projectId: string
 ): Promise<AnalysisResult> {
-  // Use only the Django backend (Groq/LangGraph) for analysis.
-  // Render deployments often "sleep"; we pre-wake via /health and retry once.
-
   const payload = {
     startupIdea,
     targetMarket,
@@ -126,34 +136,30 @@ export async function analyzeStartup(
 
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-  // 1) Pre-wake backend (no CORS preflight for simple GET)
+  // 1) Pre-wake backend
   try {
-    await fetchWithTimeout(`${DJANGO_API_URL}/health`, { method: 'GET' }, 12000);
+    await fetchWithTimeout(`${API_URL}/health`, { method: 'GET' }, 12000);
   } catch {
-    // If wake fails, we still attempt analyze; retry logic below may recover.
+    // If wake fails, we still attempt analyze
   }
 
   // 2) Analyze (retry once to survive cold starts)
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
       const response = await fetchWithTimeout(
-        `${DJANGO_API_URL}/analyze`,
+        `${API_URL}/analyze`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: getAuthHeaders(),
           body: JSON.stringify(payload),
         },
-        // Give enough time for a cold start + analysis (3 min to handle 429 retries).
         180000
       );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('Error analyzing startup (Django):', response.status, errorData);
+        console.error('Error analyzing startup:', response.status, errorData);
 
-        // Cold start often returns 502/503/504 briefly.
         if (attempt === 1 && response.status >= 500) {
           await sleep(8000);
           continue;
@@ -161,7 +167,7 @@ export async function analyzeStartup(
 
         throw new Error(
           errorData.error ||
-            `Analysis failed (Django ${response.status}). If the backend was sleeping, wait ~30s and try again.`
+            `Analysis failed (${response.status}). If the backend was sleeping, wait ~30s and try again.`
         );
       }
 
@@ -170,7 +176,7 @@ export async function analyzeStartup(
 
       return data.analysis as AnalysisResult;
     } catch (e) {
-      console.warn('Django analyze request failed:', e);
+      console.warn('Analyze request failed:', e);
       if (attempt === 1) {
         await sleep(8000);
         continue;
@@ -178,24 +184,10 @@ export async function analyzeStartup(
       throw new Error(
         e instanceof Error
           ? e.message
-          : 'Analysis failed (Django backend unreachable)'
+          : 'Analysis failed (backend unreachable)'
       );
     }
   }
 
-  // Unreachable
   throw new Error('Analysis failed');
-}
-
-
-export async function deleteProject(id: string): Promise<void> {
-  const { error } = await supabase
-    .from('projects')
-    .delete()
-    .eq('id', id);
-
-  if (error) {
-    console.error('Error deleting project:', error);
-    throw error;
-  }
 }

@@ -91,3 +91,12 @@ GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 GROQ_API_KEY_1 = os.getenv('GROQ_API_KEY_1') or GROQ_API_KEY  # Falls back to single key
 GROQ_API_KEY_2 = os.getenv('GROQ_API_KEY_2')
 GROQ_API_KEY_3 = os.getenv('GROQ_API_KEY_3')
+
+# MongoDB Configuration
+MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017')
+MONGO_DB_NAME = os.getenv('MONGO_DB_NAME', 'startup_analyzer')
+
+# JWT Configuration
+JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'dev-secret-key-change-in-production')
+JWT_ALGORITHM = 'HS256'
+JWT_EXPIRATION_HOURS = 168  # 7 days
